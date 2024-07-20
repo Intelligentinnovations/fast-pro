@@ -1,0 +1,83 @@
+generator kysely {
+  provider = "prisma-kysely"
+  output   = "../src/utils/types"
+  fileName = "database.ts"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id             String       @id @default(dbgenerated("gen_random_uuid()"))
+  email          String       @unique
+  firstname      String
+  lastname       String
+  password       String
+  status         UserStatus   @default(UNVERIFIED)
+  organizationId String
+  Organization   Organization @relation(fields: [organizationId], references: [id])
+  UserRole       UserRole[]
+  createdAt      DateTime     @default(now()) @map("created_at")
+  updatedAt      DateTime?    @updatedAt @map("updated_at")
+}
+
+model Organization {
+  id          String    @id @default(dbgenerated("gen_random_uuid()"))
+  name        String
+  companySize String
+  sector      String
+  logo        String?
+  companyId   String?
+  staff       User[]
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime? @updatedAt @map("updated_at")
+}
+
+model Role {
+  id          String           @id @default(dbgenerated("gen_random_uuid()"))
+  name        String           @unique
+  userRoles   UserRole[]
+  permissions RolePermission[]
+  createdAt   DateTime         @default(now()) @map("created_at")
+  updatedAt   DateTime?        @updatedAt @map("updated_at")
+}
+
+model Permission {
+  id              String           @id @default(dbgenerated("gen_random_uuid()"))
+  name            String
+  description     String
+  rolePermissions RolePermission[]
+  createdAt       DateTime         @default(now()) @map("created_at")
+  updatedAt       DateTime?        @updatedAt @map("updated_at")
+}
+
+model UserRole {
+  userId    String
+  roleId    String
+  user      User      @relation(fields: [userId], references: [id])
+  role      Role      @relation(fields: [roleId], references: [id])
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime? @updatedAt @map("updated_at")
+
+  @@id([userId, roleId])
+}
+
+model RolePermission {
+  roleId       String
+  permissionId String
+  role         Role       @relation(fields: [roleId], references: [id])
+  permission   Permission @relation(fields: [permissionId], references: [id])
+  createdAt    DateTime   @default(now()) @map("created_at")
+  updatedAt    DateTime?  @updatedAt @map("updated_at")
+
+  @@id([roleId, permissionId])
+}
+
+enum UserStatus {
+  UNVERIFIED
+  ACTIVE
+  DEACTIVATED
+  DELETED
+}

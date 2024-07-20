@@ -47,6 +47,11 @@ export class CustomRes<T = unknown> extends HttpException {
     return new CustomRes<T>(HttpStatus.FORBIDDEN, message);
   }
 
+  static created<T>(message = successful, data?: T): CustomRes<T> {
+    return new CustomRes<T>(HttpStatus.CREATED, message, true, data);
+  }
+
+
   static serverError<T>(message = unknownServerError): CustomRes<T> {
     return new CustomRes<T>(HttpStatus.INTERNAL_SERVER_ERROR, message);
   }

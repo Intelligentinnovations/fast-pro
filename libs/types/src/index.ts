@@ -14,3 +14,4 @@ export {
   NotificationData,
   NotificationTemplateData,
 } from './lib/types/notification';
+export * from './lib/types/user'
