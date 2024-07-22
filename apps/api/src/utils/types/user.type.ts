@@ -19,3 +19,15 @@ export interface UserWithPermissions {
     permissionName: string;
   }[] ;
 }
+
+export interface UserData  {
+  userId: string;
+  firstname: string;
+  lastname: string;
+  status: string;
+  organizationId: string;
+  permissions: {
+    permissionId: string;
+    permissionName: string
+  }[]
+}

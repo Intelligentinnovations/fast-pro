@@ -11,9 +11,28 @@ export const UserStatus = {
   DELETED: 'DELETED',
 } as const;
 export type UserStatus = (typeof UserStatus)[keyof typeof UserStatus];
+export const InviteStatus = {
+  PENDING: 'PENDING',
+  USED: 'USED',
+} as const;
+export type InviteStatus = (typeof InviteStatus)[keyof typeof InviteStatus];
+export type Invite = {
+  id: Generated<string>;
+  organizationId: string;
+  email: string;
+  roleId: string;
+  departmentId: string;
+  status: Generated<InviteStatus>;
+  created_at: Generated<Timestamp>;
+  updated_at: Timestamp | null;
+};
 export type Organization = {
   id: Generated<string>;
   name: string;
+  companySize: string;
+  sector: string;
+  logo: string | null;
+  companyId: string | null;
   created_at: Generated<Timestamp>;
   updated_at: Timestamp | null;
 };
@@ -54,6 +73,7 @@ export type UserRole = {
   updated_at: Timestamp | null;
 };
 export type DB = {
+  Invite: Invite;
   Organization: Organization;
   Permission: Permission;
   Role: Role;

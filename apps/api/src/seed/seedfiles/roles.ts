@@ -31,11 +31,27 @@ const RolesSeed = {
     await dbClient
       .insertInto('Permission')
       .values([
+
+        // admin permissions
         {
           id: '88ba5d3d-b4dd-4b6b-8580-51b166ac2534',
-          name: 'Manage users',
-          description: 'Can manage any user related task'
+          name: 'CREATE_INVITE',
+          description: 'Can send invite'
         },
+        {
+          id: 'ce7faa21-54f9-4e7e-bd50-e9393d25372a',
+          name: 'VIEW_INVITE',
+          description: 'Can view invite'
+        },
+        {
+          id: 'd831a3a7-4a00-4fe4-88ab-9f89ff7294d6',
+          name: 'DELETE_INVITE',
+          description: 'Can delete invite'
+        },
+
+
+
+
         {
           id: '58d10def-ece4-46e5-a245-0518278f918f',
           name: 'Make Request',
@@ -59,13 +75,27 @@ const RolesSeed = {
       ])
       .execute();
 
+
     await dbClient
       .insertInto('RolePermission')
       .values([
+        //admin permissions
         {
           roleId: '559f6c03-ff5a-4fcb-bbca-cf6e7e562dcd',
           permissionId: '88ba5d3d-b4dd-4b6b-8580-51b166ac2534',
         },
+        {
+          roleId: '559f6c03-ff5a-4fcb-bbca-cf6e7e562dcd',
+          permissionId: 'ce7faa21-54f9-4e7e-bd50-e9393d25372a',
+        },
+        {
+          roleId: '559f6c03-ff5a-4fcb-bbca-cf6e7e562dcd',
+          permissionId: 'd831a3a7-4a00-4fe4-88ab-9f89ff7294d6',
+        },
+
+
+
+
         {
           roleId: '5052a4a6-93f2-40ef-94c6-0c84b81c1763',
           permissionId: '58d10def-ece4-46e5-a245-0518278f918f',

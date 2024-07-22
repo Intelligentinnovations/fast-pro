@@ -6,6 +6,10 @@ export const CreateAdminAccountSchema = z.object({
   email: z.string().email(),
   password: z.string(),
   organizationName: z.string(),
+  sector: z.string(),
+  companySize: z.string(),
+  logo: z.string().optional(),
+  companyId: z.string().optional()
 });
 
 export type CreateAdminAccountPayload = z.infer<typeof CreateAdminAccountSchema>;

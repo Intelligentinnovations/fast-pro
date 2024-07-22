@@ -19,6 +19,7 @@
     "paths": {
       "@backend-template/database": ["libs/database/src/index.ts"],
       "@backend-template/graphql-server": ["libs/graphql-server/src/index.ts"],
+      "@backend-template/guard": ["libs/src/index.ts"],
       "@backend-template/helpers": ["libs/helpers/src/index.ts"],
       "@backend-template/http": ["libs/http/src/index.ts"],
       "@backend-template/messaging": ["libs/messaging/src/index.ts"],

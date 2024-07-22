@@ -17,7 +17,11 @@ export class UserRepo {
       const organization = await trx
         .insertInto('Organization')
         .values({
-        name: data.organizationName
+          sector: data.sector,
+          logo: data.logo,
+          companySize: data.companySize,
+          companyId: data.companyId,
+          name: data.organizationName
       }).returning(["id", "name"])
         .executeTakeFirstOrThrow()
 

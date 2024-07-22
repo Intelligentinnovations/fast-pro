@@ -10,6 +10,8 @@ const UserSeed = {
       .insertInto('Organization')
       .values({
         id: '1ab2610e-b332-46f3-b43e-f740912142e1',
+        companySize: '10-50',
+        sector: 'Technology',
         name: 'SpaceX',
       })
       .execute();

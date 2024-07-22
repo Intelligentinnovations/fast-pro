@@ -22,6 +22,7 @@ export async function httpBootstrap(module: unknown, globalPrefix: string) {
     .setDescription('Procurement software for enterprise')
     .setVersion('1.0')
     .addTag('Auth')
+    .addBearerAuth()
     .build();
 
   const document = SwaggerModule.createDocument(app, config);

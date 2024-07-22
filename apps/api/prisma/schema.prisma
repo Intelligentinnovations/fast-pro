@@ -33,6 +33,7 @@ model Organization {
   staff       User[]
   createdAt   DateTime  @default(now()) @map("created_at")
   updatedAt   DateTime? @updatedAt @map("updated_at")
+  Invite      Invite[]
 }
 
 model Role {
@@ -51,6 +52,18 @@ model Permission {
   rolePermissions RolePermission[]
   createdAt       DateTime         @default(now()) @map("created_at")
   updatedAt       DateTime?        @updatedAt @map("updated_at")
+}
+
+model Invite {
+  id             String       @id @default(dbgenerated("gen_random_uuid()"))
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id])
+  email          String
+  roleId         String
+  departmentId   String
+  status         InviteStatus @default(PENDING)
+  createdAt      DateTime     @default(now()) @map("created_at")
+  updatedAt      DateTime?    @updatedAt @map("updated_at")
 }
 
 model UserRole {
@@ -80,4 +93,9 @@ enum UserStatus {
   ACTIVE
   DEACTIVATED
   DELETED
+}
+
+enum InviteStatus {
+  PENDING
+  USED
 }

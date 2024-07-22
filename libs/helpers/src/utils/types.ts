@@ -9,3 +9,4 @@ export interface PaginatedData<T = unknown> {
   results: T[];
   pagination: Pagination;
 }
+

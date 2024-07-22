@@ -5,7 +5,7 @@ import { z } from 'zod';
 export const CreateInviteSchema = z.object({
   email: z.string().email(),
   roleId: z.string(),
-  department: z.string(),
+  departmentId: z.string(),
 });
 
 export type CreateInvitePayload = z.infer<typeof CreateInviteSchema>;
