@@ -7,7 +7,7 @@ import { PaginationParams } from '../utils/types/paginationParams';
 
 
 @Injectable()
-export class InviteService {
+export class StaffService {
   constructor(
     private inviteRepo: InviteRepo,
 
@@ -35,8 +35,7 @@ export class InviteService {
   }
   }
 
-  async fetchStaff ({organizationId, paginationData}:
-                      {organizationId: string; paginationData: PaginationParams}): Promise<IServiceHelper>  {
+  async fetchStaff ({organizationId, paginationData}: {organizationId: string; paginationData: PaginationParams}): Promise<IServiceHelper>  {
     const invites = await this.inviteRepo.fetchInvites({
       pagination: paginationData,
       organizationId

@@ -20,7 +20,8 @@ export class InviteRepo {
       .execute()
 
   }
-  async deleteInvite({organizationId, id}:{ organizationId: string, id: string}) {
+
+  async deleteInvite({ organizationId, id }: { organizationId: string, id: string }) {
     return this.client
       .deleteFrom('Invite')
       .where('organizationId', '=', organizationId)
@@ -28,16 +29,17 @@ export class InviteRepo {
       .execute()
 
   }
-  async fetchInvite({organizationId, id}:{ organizationId: string, id: string}) {
+
+  async fetchOrganizationInvite({ organizationId, id }: { organizationId: string, id: string }) {
     return this.client
       .selectFrom('Invite')
       .selectAll()
       .where('organizationId', '=', organizationId)
       .where('id', '=', id)
       .executeTakeFirst()
-
   }
-  async fetchInvites({pagination, organizationId}: {pagination: PaginationParams; organizationId: string}) {
+
+  async fetchInvites({ pagination, organizationId }: { pagination: PaginationParams; organizationId: string }) {
     const queryBuilder = this.client
       .selectFrom('Invite')
       .where('organizationId', '=', organizationId)
@@ -46,6 +48,13 @@ export class InviteRepo {
 
   }
 
-
+  async fetchPendingInviteById(id: string) {
+    return this.client
+      .selectFrom('Invite')
+      .selectAll()
+      .where('id', '=', id)
+      .where('status', '=', 'PENDING')
+      .executeTakeFirst()
+  }
 
 }

@@ -6,9 +6,15 @@ import { Cache } from "cache-manager";
 import jwt from 'jsonwebtoken'
 import { generateRandomNumber } from 'libs/helpers/src/lib/randomNumber';
 
+import { InviteRepo } from '../repository/invite';
 import { UserRepo } from '../repository/user';
 import { SecretsService } from '../secrets/secrets.service';
-import { CreateAdminAccountPayload, LoginPayload, VerifyEmailPayload } from '../utils/schema/auth';
+import {
+  CreateAdminAccountPayload,
+  CreateStaffAccountPayload,
+EmailPayload,
+  LoginPayload, ResetPasswordPayload,
+  VerifyOtpPayload} from '../utils/schema/auth';
 import { UserStatus } from '../utils/types';
 
 
@@ -16,6 +22,7 @@ import { UserStatus } from '../utils/types';
 export class AuthService {
   constructor(
     private userRepo: UserRepo,
+    private inviteRepo: InviteRepo,
     private secrets: SecretsService,
     @Inject(CACHE_MANAGER) private cacheManager: Cache
 
@@ -32,6 +39,7 @@ export class AuthService {
     console.log({otp});
 
     const cacheKey = `${data.email}-signup-verification`
+    await this.cacheManager.set(`${payload.email}-pending-otp`, cacheKey)
     await this.cacheManager.set(cacheKey, otp)
     // send otp via email
 
@@ -42,30 +50,9 @@ export class AuthService {
     }
   }
 
-  async verifyUser (payload: VerifyEmailPayload): Promise<IServiceHelper>  {
-    const cacheKey = `${payload.email}-signup-verification`;
-    const otp = await  this.cacheManager.get(cacheKey)
-    if(!otp) return {
-      status: 'bad-request',
-      message: "Invalid Otp"
-    }
-    const updatedUser = await this.userRepo.updateUserByEmail({
-      status: UserStatus.ACTIVE,
-      email: payload.email
-    })
-    const token = jwt.sign(updatedUser, this.secrets.get('SECRET_KEY'), {
-      expiresIn: 30000,
-    });
-    await this.cacheManager.del(cacheKey)
-    return  {
-      status: 'successful',
-      message: 'Account verification successful',
-      data: {...updatedUser, token}
-    }
-  }
 
   async login (payload: LoginPayload): Promise<IServiceHelper>  {
-    const user = await this.userRepo.getUserWithRolesAndPermissions(payload.email)
+    const user = await this.userRepo.getUserAndPermissions(payload.email)
     if(!user) return  {
       status: 'bad-request',
       message: `Invalid email or password`
@@ -73,9 +60,9 @@ export class AuthService {
     if (user.status === 'UNVERIFIED') {
       const OTP_LENGTH = 6
       const otp = generateRandomNumber(OTP_LENGTH)
-      console.log({otp});
-
       const cacheKey = `${payload.email}-signup-verification`
+
+      await this.cacheManager.set(`${user.email}-pending-otp`, cacheKey)
       await this.cacheManager.set(cacheKey, otp)
       return {
         status: 'successful',
@@ -95,7 +82,7 @@ export class AuthService {
     if(!passwordMatch) {
       if(loginRetry >= MAX_RETRY) return  {
         status: 'forbidden',
-        message: 'Your account has been locked out, please contact support'
+        message: 'Your have been locked out, please contact support'
       }
       await this.cacheManager.set(cacheKey, loginRetry + 1)
       return {
@@ -116,5 +103,124 @@ export class AuthService {
   }
   }
 
+  async registerStaff(payload: CreateStaffAccountPayload): Promise<IServiceHelper> {
+    const invite = await this.inviteRepo.fetchPendingInviteById(payload.inviteId);
+    if(!invite) return {
+      status: 'not-found',
+      message: 'Invite not found'
+    }
+
+    const userExist = await this.userRepo.getUserByEmail(invite.email)
+    if (userExist) return {
+      status: "conflict",
+      message: "An account exist with this email, please login"
+    }
+    const {email, departmentId, roleId, organizationId} = invite;
+    await this.userRepo.createStaff({
+      ...payload,
+      organizationId,
+      email,
+      departmentId,
+      roleId,
+      hashedPassword: await bcrypt.hash(payload.password, 10)
+    })
+
+    const user = await this.userRepo.getUserAndPermissions(invite.email)
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const {password, ...userData} = user
+
+    const token = jwt.sign(userData, this.secrets.get('SECRET_KEY'), {
+      expiresIn: 30000,
+    });
+
+    return {
+      status: 'created',
+      message: "Account created successful",
+      data: {...userData, token}
+    }
+  }
+
+  async requestPasswordReset ({email}: EmailPayload): Promise<IServiceHelper> {
+    const user = await this.userRepo.getUserByEmail(email)
+    if(user) {
+      const OTP_LENGTH = 6
+      const otp = generateRandomNumber(OTP_LENGTH)
+      const cacheKey = `${user.email}-password-reset`
+
+      await this.cacheManager.set(`${user.email}-pending-otp`, cacheKey)
+      await this.cacheManager.set(cacheKey, otp)
+
+      console.log({otp});
+      // Todo send email
+    }
+    return {
+      status: 'successful',
+      message: 'If you have an account, An Otp has been sent to your email.'
+    }
+  }
+
+
+  async validateOtp (payload: VerifyOtpPayload): Promise<IServiceHelper>  {
+    const pendingOtpKey = `${payload.email}-pending-otp`;
+
+    if(!pendingOtpKey) return  {
+      status: 'bad-request',
+      message: "Invalid Otp"
+    }
+    const originalOtpKey = await this.cacheManager.get<string>(pendingOtpKey) as string
+    const originalOpt = await this.cacheManager.get<string>(originalOtpKey)
+
+    if(!originalOpt || originalOpt !== payload.otp) return {
+      status: 'bad-request',
+      message: "Invalid Otp"
+    }
+
+    await this.cacheManager.del(pendingOtpKey)
+    await this.cacheManager.del(originalOtpKey)
+
+    if(originalOtpKey === `${payload.email}-signup-verification`){
+      await this.userRepo.updateUserByEmail({
+        status: UserStatus.ACTIVE,
+        email: payload.email
+      })
+
+      const updatedUser = await this.userRepo.getUserAndPermissions(payload.email);
+      const token = jwt.sign(updatedUser, this.secrets.get('SECRET_KEY'), {
+        expiresIn: 30000,
+      });
+
+      return  {
+        status: 'successful',
+        message: 'Account verification successful',
+        data: {...updatedUser, password: undefined, token}
+      }
+    }
+    const verifiedActionKey = `${payload.email}-verified-action-otp`;
+    await this.cacheManager.set(verifiedActionKey, originalOtpKey)
+    return  {
+      status: 'successful',
+      message: 'Otp verified successfully',
+    }
+  }
+
+  async resetPassword (payload: ResetPasswordPayload): Promise<IServiceHelper> {
+    const {email, password} = payload;
+    const verifiedActionKey = `${email}-verified-action-otp`
+    const verifiedAction = await this.cacheManager.get(verifiedActionKey);
+
+    if(!verifiedAction || verifiedAction !== `${email}-password-reset`) return {
+      status: 'forbidden',
+      message: 'Please verify otp to continue'
+    }
+    await this.userRepo.updateUserByEmail({
+      email,
+      password: await bcrypt.hash(password, 10)
+    });
+
+    return  {
+      status: 'successful',
+      message: 'Password reset successful'
+    }
+  }
 
 }

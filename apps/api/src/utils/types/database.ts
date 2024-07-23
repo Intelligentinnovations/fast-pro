@@ -16,6 +16,13 @@ export const InviteStatus = {
   USED: 'USED',
 } as const;
 export type InviteStatus = (typeof InviteStatus)[keyof typeof InviteStatus];
+export type Department = {
+  id: Generated<string>;
+  organizationId: string;
+  name: string;
+  created_at: Generated<Timestamp>;
+  updated_at: Timestamp | null;
+};
 export type Invite = {
   id: Generated<string>;
   organizationId: string;
@@ -63,6 +70,7 @@ export type User = {
   password: string;
   status: Generated<UserStatus>;
   organizationId: string;
+  departmentId: string | null;
   created_at: Generated<Timestamp>;
   updated_at: Timestamp | null;
 };
@@ -73,6 +81,7 @@ export type UserRole = {
   updated_at: Timestamp | null;
 };
 export type DB = {
+  Department: Department;
   Invite: Invite;
   Organization: Organization;
   Permission: Permission;
