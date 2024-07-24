@@ -36,7 +36,6 @@ export class AuthController {
   async adminRegistration(@Body() payload: CreateAdminAccountPayload) {
     const data = await this.authService.registerAdmin(payload)
     return convertAndSendResponse(data)
-
   }
 
   @Post('staff-register')
@@ -48,9 +47,7 @@ export class AuthController {
   async staffRegistration(@Body() payload: CreateStaffAccountPayload) {
     const data = await this.authService.registerStaff(payload)
     return convertAndSendResponse(data)
-
   }
-
 
   @Post("validate-otp")
   @ApiOperation({summary: 'Validate a otp generated on the system'})
@@ -60,6 +57,17 @@ export class AuthController {
   @UsePipes(new ZodValidationPipe(VerifyOtpSchema))
   async validateOtp(@Body() payload: VerifyOtpPayload) {
     const data = await this.authService.validateOtp(payload)
+    return convertAndSendResponse(data)
+  }
+
+  @Post("resend-otp")
+  @ApiOperation({summary: 'Resend Otp'})
+  @ApiBody({ schema: zodToApi(EmailSchema)})
+  @ApiOkResponse({description: `Otp sent successful`})
+  @ApiBadRequestResponse({description: 'No pending otp'})
+  @UsePipes(new ZodValidationPipe(EmailSchema))
+  async resendOtp(@Body() payload: VerifyOtpPayload) {
+    const data = await this.authService.resendOtp(payload)
     return convertAndSendResponse(data)
   }
 

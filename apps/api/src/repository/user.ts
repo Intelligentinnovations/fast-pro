@@ -1,9 +1,12 @@
 import { KyselyService } from '@backend-template/database';
+import { PaginatedData } from '@backend-template/helpers';
+import { IServiceHelper } from '@backend-template/types';
 import { Injectable } from '@nestjs/common';
 import bcrypt from 'bcrypt'
 
+import { paginate } from '../utils';
 import { CreateAdminAccountPayload, CreateStaffAccountPayload } from '../utils/schema/auth';
-import { DB, UserStatus } from '../utils/types';
+import { DB, Invite, PaginationParams, UserStatus } from '../utils/types';
 import {  UpdateUserPayload, UserData } from '../utils/types/user.type';
 
 @Injectable()
@@ -107,6 +110,7 @@ export class UserRepo {
           lastname: row.lastname,
           status: row.status,
           password: row.password,
+          role: row.roleName,
           organizationId: row.organizationId,
           permissions: [],
         };
@@ -146,6 +150,21 @@ export class UserRepo {
 
     });
 
+  }
+
+  async fetchOrganizationUsers({organizationId, pagination} : {organizationId: string; pagination: PaginationParams} ) {
+    const queryBuilder = this.client
+      .selectFrom('User')
+      .where('organizationId', '=', organizationId)
+      .selectAll();
+    return paginate<Invite>(queryBuilder, pagination);
+  }
+
+  async deleteOrganizationUser({organizationId, userId}: { organizationId: string; userId: string }) {
+    return this.client
+      .deleteFrom('User')
+      .where('organizationId', '=', organizationId)
+      .where('id', '=', userId)
   }
 
 }

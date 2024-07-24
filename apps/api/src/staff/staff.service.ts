@@ -1,51 +1,33 @@
 import { IServiceHelper } from '@backend-template/types';
 import { Injectable } from '@nestjs/common';
 
-import { InviteRepo } from '../repository/invite';
-import { CreateInvitePayload } from '../utils/schema/staff';
-import { PaginationParams } from '../utils/types/paginationParams';
-
+import { UserRepo } from '../repository/user';
+import { PaginationParams } from '../utils';
 
 @Injectable()
 export class StaffService {
   constructor(
-    private inviteRepo: InviteRepo,
-
+    private userRepo: UserRepo,
   ) { }
-  async invite(payload: CreateInvitePayload & {organizationId: string}): Promise<IServiceHelper> {
-    const invite = await this.inviteRepo.createInvite(payload)
-    return {
-      status: 'created',
-      message: `You have successfully sent an invite to ${payload.email}`,
-      data: invite
 
-    }
-  }
-
-  async delete (payload: {organizationId: string; id: string}): Promise<IServiceHelper>  {
-    const invite = await this.inviteRepo.fetchOrganizationInvite(payload)
-    if(invite?.status === 'USED') return {
-      status: 'forbidden',
-      message: 'The invite has already been used by a user'
-    }
-    await this.inviteRepo.deleteInvite(payload)
-    return {
-    status: 'deleted',
-    message: "Invite deleted successfully"
-  }
-  }
-
-  async fetchStaff ({organizationId, paginationData}: {organizationId: string; paginationData: PaginationParams}): Promise<IServiceHelper>  {
-    const invites = await this.inviteRepo.fetchInvites({
+  async fetchStaff ({ organizationId, paginationData }: { organizationId: string; paginationData: PaginationParams }): Promise<IServiceHelper>  {
+    const staff = await this.userRepo.fetchOrganizationUsers({
       pagination: paginationData,
       organizationId
     })
     return {
     status: 'successful',
-    message: "Invited fetched successfully",
-    data: invites
+    message: "Staff fetched successfully",
+    data: staff
   }
   }
 
+  async delete ({ organizationId, id }: { organizationId: string; id: string}): Promise<IServiceHelper>  {
+    await this.userRepo.deleteOrganizationUser({ organizationId, userId: id })
+    return {
+    status: 'deleted',
+    message: "Staff deleted successfully"
+    }
+  }
 
 }

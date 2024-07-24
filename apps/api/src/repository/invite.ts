@@ -1,10 +1,11 @@
 import { KyselyService } from '@backend-template/database';
 import { Injectable } from '@nestjs/common';
 
-import { paginate } from '../utils/paginate';
+import { paginate } from '../utils';
+import { DB, Invite } from '../utils';
+import { PaginationParams } from '../utils';
 import { CreateInvitePayload } from '../utils/schema/staff';
-import { DB, Invite } from '../utils/types';
-import { PaginationParams } from '../utils/types/paginationParams';
+import { UpdateInvitePayload } from '../utils/types/invite';
 @Injectable()
 export class InviteRepo {
   constructor(
@@ -55,6 +56,19 @@ export class InviteRepo {
       .where('id', '=', id)
       .where('status', '=', 'PENDING')
       .executeTakeFirst()
+  }
+  async updateInviteById({id, organizationId, payload}: {
+    id:string;
+    organizationId: string;
+    payload: UpdateInvitePayload
+  }) {
+    return this.client
+      .updateTable('Invite')
+      .set({...payload})
+      .where('id', '=', id)
+      .where('organizationId', '=', organizationId)
+      .where('status', '=', 'PENDING')
+      .execute()
   }
 
 }

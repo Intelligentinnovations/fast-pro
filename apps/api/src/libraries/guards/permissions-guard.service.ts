@@ -5,7 +5,7 @@ import { UserData } from '../../utils/types/user.type';
 import { PERMISSION_KEY } from './role.decorator';
 
 @Injectable()
-export class RolesGuard implements CanActivate {
+export class PermissionsGuard implements CanActivate {
   constructor(
     private reflector: Reflector,
   ) {}

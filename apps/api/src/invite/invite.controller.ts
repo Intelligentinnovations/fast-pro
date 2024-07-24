@@ -1,11 +1,12 @@
 import { convertAndSendResponse, zodToApi } from '@backend-template/helpers';
 import {  ZodValidationPipe } from '@backend-template/http';
-import { Body,
+import {
+  Body,
   Controller,
   Delete,
   Get,
   Param,
-  Post,
+  Post, Put,
   Query,
   Request,
   UseGuards,
@@ -25,19 +26,18 @@ import {
 import { FastifyRequest } from 'fastify';
 
 import { AuthGuard } from '../libraries/guards/auth.guards';
+import { PermissionsGuard } from '../libraries/guards/permissions-guard.service';
 import {RequiredPermission} from '../libraries/guards/role.decorator'
-import { RolesGuard } from '../libraries/guards/roles.guard';
+import { PaginationParams, Permission } from '../utils';
 import {
   CreateInvitePayload,
-  CreateInviteSchema,
+  CreateInviteSchema, UpdateInvitePayload, UpdateInviteSchema
 } from '../utils/schema/staff';
-import { PaginationParams } from '../utils/types/paginationParams';
-import { Permission } from '../utils/types/permission'
 import { InviteService } from './invite.service';
 
 @ApiTags('Invite')
 @ApiBearerAuth()
-@UseGuards(AuthGuard, RolesGuard)
+@UseGuards(AuthGuard, PermissionsGuard)
 @Controller('invite')
 export class InviteController {
   constructor(private readonly staffService: InviteService) {}
@@ -57,8 +57,23 @@ export class InviteController {
     return convertAndSendResponse(data)
 
   }
+  @Put('/:id')
+  @RequiredPermission(Permission.UPDATE_INVITE)
+  @ApiOperation({summary: 'Update staff invite'})
+  @ApiBody({description: 'Update invite payload', schema: zodToApi(UpdateInviteSchema)})
+  @ApiOkResponse({description: 'Invite updated successfully'})
+  @UsePipes(new ZodValidationPipe(UpdateInviteSchema))
+  async updateInvite(@Body() payload: UpdateInvitePayload, @Param('id') inviteId: string,  @Request() req: FastifyRequest) {
+    const data = await this.staffService.updateInvite({
+      ...payload,
+      inviteId,
+      organizationId: req.user?.organizationId as string
+    })
+    return convertAndSendResponse(data)
 
-  @Delete("delete/:id")
+  }
+
+  @Delete("/:id")
   @RequiredPermission(Permission.DELETE_INVITE)
   @ApiOperation({summary: 'Delete invite'})
   @ApiOkResponse({description: 'Invite deleted successfully'})
@@ -80,7 +95,7 @@ export class InviteController {
   @ApiOkResponse({description: 'Invites fetched successfully'})
   @ApiForbiddenResponse({description: 'Insufficient permission'})
   async getStaff(@Request() req: FastifyRequest, @Query() paginationData: PaginationParams) {
-    const data = await this.staffService.fetchStaff({
+    const data = await this.staffService.fetchInvites({
       organizationId: req.user?.organizationId as string,
       paginationData
     })

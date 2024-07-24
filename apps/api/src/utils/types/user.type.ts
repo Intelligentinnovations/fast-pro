@@ -14,6 +14,7 @@ export interface UserData  {
   firstname: string;
   lastname: string;
   status: string;
+  role: string;
   organizationId: string;
   permissions: {
     name: string

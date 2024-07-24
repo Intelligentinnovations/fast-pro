@@ -99,7 +99,7 @@ export class AuthService {
   return {
     status: 'successful',
     message: "Login successful",
-    data: {...userData, token}
+    data: {...userData, permissions: undefined, token}
   }
   }
 
@@ -132,11 +132,16 @@ export class AuthService {
     const token = jwt.sign(userData, this.secrets.get('SECRET_KEY'), {
       expiresIn: 30000,
     });
+    await this.inviteRepo.updateInviteById({
+      id:payload.inviteId,
+      organizationId,
+      payload: {status: 'USED'}
+    })
 
     return {
       status: 'created',
       message: "Account created successful",
-      data: {...userData, token}
+      data: {...userData, permissions: undefined, token}
     }
   }
 
@@ -222,5 +227,26 @@ export class AuthService {
       message: 'Password reset successful'
     }
   }
+
+  async resendOtp ({email}: EmailPayload): Promise<IServiceHelper> {
+    const pendingOtpKey = `${email}-pending-otp`;
+    const originalOtpKey = await this.cacheManager.get<string>(pendingOtpKey) as string
+
+    if(!originalOtpKey) return {
+      status: 'bad-request',
+      message: 'No pending otp',
+    }
+
+    const OTP_LENGTH = 6
+    const otp = generateRandomNumber(OTP_LENGTH)
+    await this.cacheManager.set(originalOtpKey, otp)
+
+    return {
+      status: 'successful',
+      message: 'Otp sent successfully'
+    }
+  }
+
+
 
 }

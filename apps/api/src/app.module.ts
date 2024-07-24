@@ -10,6 +10,8 @@ import { LibrariesModule } from './libraries/libraries';
 import { RepositoryModule } from './repository/repository.module';
 import { SecretsModule } from './secrets/secrets.module';
 import { SecretsService } from './secrets/secrets.service';
+import { StaffModule } from './staff/staff.module';
+import { LoggingInterceptor } from './utils/loggerInterceptor';
 
 
 @Module({
@@ -28,12 +30,17 @@ import { SecretsService } from './secrets/secrets.service';
     }),
     AuthModule,
     InviteModule,
+    StaffModule,
     RepositoryModule,
   ],
   providers: [
     {
       provide: APP_INTERCEPTOR,
       useClass: DefaultInterceptor,
+    },
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: LoggingInterceptor,
     },
   ],
 })
