@@ -19,7 +19,13 @@ model User {
   organizationId String
   Organization   Organization @relation(fields: [organizationId], references: [id])
   departmentId   String?
-  departmennt    Department?  @relation(fields: [departmentId], references: [id])
+  department     Department?  @relation(fields: [departmentId], references: [id])
+  isDeleted      Boolean      @default(false)
+  profileImage   String?
+  title          String?
+  biography      String?
+  phoneNumber    String?
+  address        String?
   UserRole       UserRole[]
   createdAt      DateTime     @default(now()) @map("created_at")
   updatedAt      DateTime?    @updatedAt @map("updated_at")
@@ -32,7 +38,12 @@ model Organization {
   sector      String
   logo        String?
   companyId   String?
+  description String?
+  websiteUrl  String?
   staff       User[]
+  email       String?
+  phoneNumber String?
+  address     String?
   createdAt   DateTime     @default(now()) @map("created_at")
   updatedAt   DateTime?    @updatedAt @map("updated_at")
   Invite      Invite[]

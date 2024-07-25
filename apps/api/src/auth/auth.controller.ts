@@ -12,8 +12,6 @@ import {
 import {
   CreateAdminAccountPayload,
   CreateAdminAccountSchema,
-  CreateStaffAccountPayload,
-  CreateStaffAccountSchema,
   EmailPayload, EmailSchema,
   LoginPayload,
   LoginSchema,
@@ -35,17 +33,6 @@ export class AuthController {
   @UsePipes(new ZodValidationPipe(CreateAdminAccountSchema))
   async adminRegistration(@Body() payload: CreateAdminAccountPayload) {
     const data = await this.authService.registerAdmin(payload)
-    return convertAndSendResponse(data)
-  }
-
-  @Post('staff-register')
-  @ApiOperation({summary: 'Staff Signup.'})
-  @ApiBody({description: 'Staff Registration data', schema: zodToApi(CreateStaffAccountSchema)})
-  @ApiCreatedResponse({description: `Account created successful`})
-  @ApiConflictResponse({description: 'An account exist with this email, please login'})
-  @UsePipes(new ZodValidationPipe(CreateStaffAccountSchema))
-  async staffRegistration(@Body() payload: CreateStaffAccountPayload) {
-    const data = await this.authService.registerStaff(payload)
     return convertAndSendResponse(data)
   }
 

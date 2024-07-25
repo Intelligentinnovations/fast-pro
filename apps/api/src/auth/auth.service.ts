@@ -103,48 +103,6 @@ export class AuthService {
   }
   }
 
-  async registerStaff(payload: CreateStaffAccountPayload): Promise<IServiceHelper> {
-    const invite = await this.inviteRepo.fetchPendingInviteById(payload.inviteId);
-    if(!invite) return {
-      status: 'not-found',
-      message: 'Invite not found'
-    }
-
-    const userExist = await this.userRepo.getUserByEmail(invite.email)
-    if (userExist) return {
-      status: "conflict",
-      message: "An account exist with this email, please login"
-    }
-    const {email, departmentId, roleId, organizationId} = invite;
-    await this.userRepo.createStaff({
-      ...payload,
-      organizationId,
-      email,
-      departmentId,
-      roleId,
-      hashedPassword: await bcrypt.hash(payload.password, 10)
-    })
-
-    const user = await this.userRepo.getUserAndPermissions(invite.email)
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const {password, ...userData} = user
-
-    const token = jwt.sign(userData, this.secrets.get('SECRET_KEY'), {
-      expiresIn: 30000,
-    });
-    await this.inviteRepo.updateInviteById({
-      id:payload.inviteId,
-      organizationId,
-      payload: {status: 'USED'}
-    })
-
-    return {
-      status: 'created',
-      message: "Account created successful",
-      data: {...userData, permissions: undefined, token}
-    }
-  }
-
   async requestPasswordReset ({email}: EmailPayload): Promise<IServiceHelper> {
     const user = await this.userRepo.getUserByEmail(email)
     if(user) {

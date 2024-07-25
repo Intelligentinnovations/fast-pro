@@ -1,13 +1,10 @@
 import { KyselyService } from '@backend-template/database';
-import { PaginatedData } from '@backend-template/helpers';
-import { IServiceHelper } from '@backend-template/types';
 import { Injectable } from '@nestjs/common';
 import bcrypt from 'bcrypt'
 
 import { paginate } from '../utils';
+import { DB, Invite, PaginationParams, UpdateUserPayload, UserData,UserStatus } from '../utils';
 import { CreateAdminAccountPayload, CreateStaffAccountPayload } from '../utils/schema/auth';
-import { DB, Invite, PaginationParams, UserStatus } from '../utils/types';
-import {  UpdateUserPayload, UserData } from '../utils/types/user.type';
 
 @Injectable()
 export class UserRepo {
@@ -65,6 +62,9 @@ export class UserRepo {
 
   async getUserByEmail(email: string) {
     return this.client.selectFrom("User").selectAll().where('email', '=', email).executeTakeFirst()
+  }
+  async getUserById(id: string) {
+    return this.client.selectFrom("User").selectAll().where('id', '=', id).executeTakeFirst()
   }
 
   async updateUserByEmail(payload: UpdateUserPayload) {
@@ -141,30 +141,36 @@ export class UserRepo {
         }).returning(['id'])
         .executeTakeFirstOrThrow()
 
-
       await trx.insertInto('UserRole').values({
         roleId: data.roleId,
         userId: user.id
       }).returningAll()
         .executeTakeFirstOrThrow()
-
     });
-
   }
-
-  async fetchOrganizationUsers({organizationId, pagination} : {organizationId: string; pagination: PaginationParams} ) {
-    const queryBuilder = this.client
+  async fetchOrganizationUsers({organizationId, pagination, currentUserId} : {
+    organizationId: string; pagination: PaginationParams; currentUserId: string
+  } ) {
+    const queryBuilder =  this.client
       .selectFrom('User')
-      .where('organizationId', '=', organizationId)
-      .selectAll();
-    return paginate<Invite>(queryBuilder, pagination);
+      .leftJoin('Department', 'User.departmentId', 'Department.id')
+      .innerJoin('UserRole', 'User.id', 'UserRole.userId')
+      .innerJoin('Role', 'UserRole.roleId', 'Role.id')
+      .select(['User.id', 'firstname', 'lastname', 'email', 'Department.name as department', 'Role.name as role', 'User.created_at as createdAt'])
+      .where('User.organizationId', '=', organizationId)
+      .where('User.id', '!=', currentUserId)
+      .where('User.isDeleted', '==', false);
+    return paginate<Invite>({queryBuilder, pagination, identifier: 'User.id'});
   }
 
-  async deleteOrganizationUser({organizationId, userId}: { organizationId: string; userId: string }) {
+  async deleteUser({ userId, organizationId }:{userId: string; organizationId: string}) {
     return this.client
-      .deleteFrom('User')
-      .where('organizationId', '=', organizationId)
-      .where('id', '=', userId)
+      .updateTable('User')
+      .set({isDeleted: true})
+      .where('id', '=',userId)
+      .where('organizationId', '=',organizationId)
+      .executeTakeFirstOrThrow();
+
   }
 
 }

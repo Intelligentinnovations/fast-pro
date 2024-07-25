@@ -45,7 +45,7 @@ export class InviteRepo {
       .selectFrom('Invite')
       .where('organizationId', '=', organizationId)
       .selectAll();
-    return paginate<Invite>(queryBuilder, pagination);
+    return paginate<Invite>({queryBuilder, pagination, identifier: 'id'});
 
   }
 

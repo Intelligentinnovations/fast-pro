@@ -5,7 +5,7 @@ import {
 } from '@nestjs/platform-fastify';
 import { DocumentBuilder,SwaggerModule } from '@nestjs/swagger';
 
-import { CustomResFilter } from './custom-res.filter';
+import { GlobalExceptionFilter } from './custom-res.filter';
 
 
 export async function httpBootstrap(module: unknown, globalPrefix: string) {
@@ -15,7 +15,7 @@ export async function httpBootstrap(module: unknown, globalPrefix: string) {
   );
 
   app.setGlobalPrefix(globalPrefix);
-  app.useGlobalFilters(new CustomResFilter());
+  app.useGlobalFilters(new GlobalExceptionFilter());
 
   const config = new DocumentBuilder()
     .setTitle('Fast Pro')

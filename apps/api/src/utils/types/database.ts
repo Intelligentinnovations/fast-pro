@@ -40,6 +40,8 @@ export type Organization = {
   sector: string;
   logo: string | null;
   companyId: string | null;
+  description: string | null;
+  websiteUrl: string | null;
   created_at: Generated<Timestamp>;
   updated_at: Timestamp | null;
 };
@@ -71,6 +73,10 @@ export type User = {
   status: Generated<UserStatus>;
   organizationId: string;
   departmentId: string | null;
+  isDeleted: Generated<boolean>;
+  profileImage: string | null;
+  title: string | null;
+  biography: string | null;
   created_at: Generated<Timestamp>;
   updated_at: Timestamp | null;
 };

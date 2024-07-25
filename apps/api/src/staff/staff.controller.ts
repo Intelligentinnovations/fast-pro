@@ -1,15 +1,17 @@
-import { convertAndSendResponse } from '@backend-template/helpers';
+import { convertAndSendResponse, zodToApi } from '@backend-template/helpers';
+import { ZodValidationPipe } from '@backend-template/http';
 import {
+  Body,
   Controller,
   Delete,
   Get,
-  Param,
+  Param, Post,
   Query,
   Request,
-  UseGuards,
+  UseGuards, UsePipes
 } from '@nestjs/common';
 import {
-  ApiBearerAuth,
+  ApiBearerAuth, ApiBody, ApiConflictResponse, ApiCreatedResponse,
   ApiForbiddenResponse,
   ApiOkResponse,
   ApiOperation, ApiQuery,
@@ -20,19 +22,31 @@ import { FastifyRequest } from 'fastify';
 import { AuthGuard } from '../libraries/guards/auth.guards';
 import { PermissionsGuard } from '../libraries/guards/permissions-guard.service';
 import {RequiredPermission} from '../libraries/guards/role.decorator'
-import { PaginationParams } from '../utils/types/paginationParams';
-import { Permission } from '../utils/types/permission'
+import { PaginationParams,Permission } from '../utils';
+import { CreateStaffAccountPayload, CreateStaffAccountSchema } from '../utils/schema/auth';
 import { StaffService } from './staff.service';
 
 @ApiTags('Staff')
 @ApiBearerAuth()
-@UseGuards(AuthGuard, PermissionsGuard)
 @Controller('staff')
 export class StaffController {
   constructor(private readonly staffService: StaffService) {}
 
 
+  @Post('register')
+  @ApiOperation({summary: 'Staff Signup.'})
+  @ApiBody({description: 'Staff Registration data', schema: zodToApi(CreateStaffAccountSchema)})
+  @ApiCreatedResponse({description: `Account created successful`})
+  @ApiConflictResponse({description: 'An account exist with this email, please login'})
+  @UsePipes(new ZodValidationPipe(CreateStaffAccountSchema))
+  async staffRegistration(@Body() payload: CreateStaffAccountPayload) {
+    const data = await this.staffService.registerStaff(payload)
+    return convertAndSendResponse(data)
+  }
+
+
   @Get("")
+  @UseGuards(AuthGuard, PermissionsGuard)
   @RequiredPermission(Permission.VIEW_STAFF)
   @ApiOperation({summary: 'Fetch all staff'})
   @ApiQuery({ name: 'page', required: false, type: Number, description: 'Page number' })
@@ -42,12 +56,14 @@ export class StaffController {
   async getStaff(@Request() req: FastifyRequest, @Query() paginationData: PaginationParams) {
     const data = await this.staffService.fetchStaff({
       organizationId: req.user?.organizationId as string,
-      paginationData
+      paginationData,
+      currentUserId: req.user?.userId as string
     })
     return convertAndSendResponse(data)
   }
 
   @Delete(":id")
+  @UseGuards(AuthGuard, PermissionsGuard)
   @RequiredPermission(Permission.DELETE_STAFF)
   @ApiOperation({summary: 'Delete a staff'})
   @ApiOkResponse({description: 'staff deleted successfully'})
