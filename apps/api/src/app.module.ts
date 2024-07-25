@@ -12,6 +12,7 @@ import { SecretsModule } from './secrets/secrets.module';
 import { SecretsService } from './secrets/secrets.service';
 import { StaffModule } from './staff/staff.module';
 import { LoggingInterceptor } from './utils/loggerInterceptor';
+import { UserModule } from './user/user.module';
 
 
 @Module({
@@ -31,6 +32,7 @@ import { LoggingInterceptor } from './utils/loggerInterceptor';
     AuthModule,
     InviteModule,
     StaffModule,
+    UserModule,
     RepositoryModule,
   ],
   providers: [

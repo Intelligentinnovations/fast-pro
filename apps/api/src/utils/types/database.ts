@@ -11,6 +11,12 @@ export const UserStatus = {
   DELETED: 'DELETED',
 } as const;
 export type UserStatus = (typeof UserStatus)[keyof typeof UserStatus];
+export const VendorStatus = {
+  INACTIVE: 'INACTIVE',
+  ACTIVE: 'ACTIVE',
+  DEACTIVATED: 'DEACTIVATED',
+} as const;
+export type VendorStatus = (typeof VendorStatus)[keyof typeof VendorStatus];
 export const InviteStatus = {
   PENDING: 'PENDING',
   USED: 'USED',
@@ -42,6 +48,9 @@ export type Organization = {
   companyId: string | null;
   description: string | null;
   websiteUrl: string | null;
+  email: string | null;
+  phoneNumber: string | null;
+  address: string | null;
   created_at: Generated<Timestamp>;
   updated_at: Timestamp | null;
 };
@@ -71,18 +80,37 @@ export type User = {
   lastname: string;
   password: string;
   status: Generated<UserStatus>;
-  organizationId: string;
+  organizationId: string | null;
+  vendorId: string | null;
   departmentId: string | null;
   isDeleted: Generated<boolean>;
   profileImage: string | null;
   title: string | null;
   biography: string | null;
+  phoneNumber: string | null;
+  address: string | null;
   created_at: Generated<Timestamp>;
   updated_at: Timestamp | null;
 };
 export type UserRole = {
   userId: string;
   roleId: string;
+  created_at: Generated<Timestamp>;
+  updated_at: Timestamp | null;
+};
+export type Vendor = {
+  id: Generated<string>;
+  name: string;
+  sector: string | null;
+  logo: string | null;
+  description: string | null;
+  taxIdentificationNumber: string | null;
+  certificateOfRegistration: string | null;
+  businessRegistrationNumber: string | null;
+  email: string | null;
+  phoneNumber: string | null;
+  address: string | null;
+  status: Generated<VendorStatus>;
   created_at: Generated<Timestamp>;
   updated_at: Timestamp | null;
 };
@@ -95,4 +123,5 @@ export type DB = {
   RolePermission: RolePermission;
   User: User;
   UserRole: UserRole;
+  Vendor: Vendor;
 };

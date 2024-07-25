@@ -3,38 +3,21 @@ import {  ZodValidationPipe } from '@backend-template/http';
 import { Body, Controller, Post, UsePipes } from '@nestjs/common';
 import {
   ApiBadRequestResponse,
-  ApiBody, ApiConflictResponse,
-  ApiCreatedResponse, ApiForbiddenResponse, ApiOkResponse,
-  ApiOperation,
-  ApiTags
+  ApiBody, ApiForbiddenResponse, ApiOkResponse,
+  ApiOperation, ApiTags
 } from '@nestjs/swagger';
 
 import {
-  CreateAdminAccountPayload,
-  CreateAdminAccountSchema,
   EmailPayload, EmailSchema,
-  LoginPayload,
-  LoginSchema,
-ResetPasswordPayload,
-ResetPasswordSchema,   VerifyOtpPayload,
-  VerifyOtpSchema} from '../utils/schema/auth';
+  LoginPayload, LoginSchema, ResetPasswordPayload,
+  ResetPasswordSchema, VerifyOtpPayload, VerifyOtpSchema
+} from '../utils/schema/auth';
 import { AuthService } from './auth.service';
 
 @ApiTags('Auth')
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
-
-  @Post('admin-register')
-  @ApiOperation({summary: 'Admin/organization Signup.'})
-  @ApiBody({description: 'Admin Registration', schema: zodToApi(CreateAdminAccountSchema)})
-  @ApiCreatedResponse({description: `We have sent a code to your email`})
-  @ApiConflictResponse({description: 'A user with the email exist'})
-  @UsePipes(new ZodValidationPipe(CreateAdminAccountSchema))
-  async adminRegistration(@Body() payload: CreateAdminAccountPayload) {
-    const data = await this.authService.registerAdmin(payload)
-    return convertAndSendResponse(data)
-  }
 
   @Post("validate-otp")
   @ApiOperation({summary: 'Validate a otp generated on the system'})

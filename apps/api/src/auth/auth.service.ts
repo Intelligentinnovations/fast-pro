@@ -6,50 +6,20 @@ import { Cache } from "cache-manager";
 import jwt from 'jsonwebtoken'
 import { generateRandomNumber } from 'libs/helpers/src/lib/randomNumber';
 
-import { InviteRepo } from '../repository/invite';
 import { UserRepo } from '../repository/user';
 import { SecretsService } from '../secrets/secrets.service';
-import {
-  CreateAdminAccountPayload,
-  CreateStaffAccountPayload,
-EmailPayload,
-  LoginPayload, ResetPasswordPayload,
-  VerifyOtpPayload} from '../utils/schema/auth';
-import { UserStatus } from '../utils/types';
+import { UserStatus } from '../utils';
+import { EmailPayload, LoginPayload, ResetPasswordPayload, VerifyOtpPayload} from '../utils/schema/auth';
 
 
 @Injectable()
 export class AuthService {
   constructor(
     private userRepo: UserRepo,
-    private inviteRepo: InviteRepo,
     private secrets: SecretsService,
     @Inject(CACHE_MANAGER) private cacheManager: Cache
 
   ) { }
-  async registerAdmin(payload: CreateAdminAccountPayload): Promise<IServiceHelper> {
-    const userExist = await this.userRepo.getUserByEmail(payload.email)
-    if (userExist) return {
-      status: "conflict",
-      message: "A user with the email exist"
-    }
-    const data = await this.userRepo.createOrganization(payload)
-    const OTP_LENGTH = 6
-    const otp = generateRandomNumber(OTP_LENGTH)
-    console.log({otp});
-
-    const cacheKey = `${data.email}-signup-verification`
-    await this.cacheManager.set(`${payload.email}-pending-otp`, cacheKey)
-    await this.cacheManager.set(cacheKey, otp)
-    // send otp via email
-
-    return {
-      status: 'created',
-      message: `We have sent a code to ${payload.email}`,
-      data
-    }
-  }
-
 
   async login (payload: LoginPayload): Promise<IServiceHelper>  {
     const user = await this.userRepo.getUserAndPermissions(payload.email)
@@ -61,6 +31,8 @@ export class AuthService {
       const OTP_LENGTH = 6
       const otp = generateRandomNumber(OTP_LENGTH)
       const cacheKey = `${payload.email}-signup-verification`
+
+      console.log({otp});
 
       await this.cacheManager.set(`${user.email}-pending-otp`, cacheKey)
       await this.cacheManager.set(cacheKey, otp)
@@ -131,9 +103,9 @@ export class AuthService {
       message: "Invalid Otp"
     }
     const originalOtpKey = await this.cacheManager.get<string>(pendingOtpKey) as string
-    const originalOpt = await this.cacheManager.get<string>(originalOtpKey)
+    const originalOtp = await this.cacheManager.get<string>(originalOtpKey)
 
-    if(!originalOpt || originalOpt !== payload.otp) return {
+    if(!originalOtp || originalOtp !== payload.otp) return {
       status: 'bad-request',
       message: "Invalid Otp"
     }
@@ -155,7 +127,7 @@ export class AuthService {
       return  {
         status: 'successful',
         message: 'Account verification successful',
-        data: {...updatedUser, password: undefined, token}
+        data: {...updatedUser, permissions: undefined, password: undefined, token}
       }
     }
     const verifiedActionKey = `${payload.email}-verified-action-otp`;

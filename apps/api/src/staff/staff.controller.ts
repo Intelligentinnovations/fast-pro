@@ -23,11 +23,10 @@ import { AuthGuard } from '../libraries/guards/auth.guards';
 import { PermissionsGuard } from '../libraries/guards/permissions-guard.service';
 import {RequiredPermission} from '../libraries/guards/role.decorator'
 import { PaginationParams,Permission } from '../utils';
-import { CreateStaffAccountPayload, CreateStaffAccountSchema } from '../utils/schema/auth';
 import { StaffService } from './staff.service';
+import { CreateStaffAccountPayload, CreateStaffAccountSchema } from '../utils/schema/user';
 
 @ApiTags('Staff')
-@ApiBearerAuth()
 @Controller('staff')
 export class StaffController {
   constructor(private readonly staffService: StaffService) {}
@@ -46,6 +45,7 @@ export class StaffController {
 
 
   @Get("")
+  @ApiBearerAuth()
   @UseGuards(AuthGuard, PermissionsGuard)
   @RequiredPermission(Permission.VIEW_STAFF)
   @ApiOperation({summary: 'Fetch all staff'})
@@ -63,6 +63,7 @@ export class StaffController {
   }
 
   @Delete(":id")
+  @ApiBearerAuth()
   @UseGuards(AuthGuard, PermissionsGuard)
   @RequiredPermission(Permission.DELETE_STAFF)
   @ApiOperation({summary: 'Delete a staff'})
