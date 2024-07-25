@@ -2,18 +2,18 @@ import { DefaultInterceptor } from '@backend-template/rest-server';
 import { CacheModule } from '@nestjs/cache-manager';
 import { Module } from '@nestjs/common';
 import { APP_INTERCEPTOR } from '@nestjs/core';
-import { redisStore } from "cache-manager-redis-yet";
+import { redisStore } from 'cache-manager-redis-yet';
 
 import { AuthModule } from './auth/auth.module';
 import { InviteModule } from './invite/invite.module';
 import { LibrariesModule } from './libraries/libraries';
+import { ProductModule } from './product/product.module';
 import { RepositoryModule } from './repository/repository.module';
 import { SecretsModule } from './secrets/secrets.module';
 import { SecretsService } from './secrets/secrets.service';
 import { StaffModule } from './staff/staff.module';
-import { LoggingInterceptor } from './utils/loggerInterceptor';
 import { UserModule } from './user/user.module';
-
+import { LoggingInterceptor } from './utils/loggerInterceptor';
 
 @Module({
   imports: [
@@ -23,7 +23,10 @@ import { UserModule } from './user/user.module';
       useFactory: async (secrets: SecretsService) => {
         return {
           isGlobal: true,
-          store: await redisStore({ url: secrets.get("REDIS_URL"), ttl: 600000 }),
+          store: await redisStore({
+            url: secrets.get('REDIS_URL'),
+            ttl: 600000,
+          }),
         };
       },
       inject: [SecretsService],
@@ -32,6 +35,7 @@ import { UserModule } from './user/user.module';
     AuthModule,
     InviteModule,
     StaffModule,
+    ProductModule,
     UserModule,
     RepositoryModule,
   ],

@@ -56,7 +56,8 @@
       "options": {
         "lintFilePatterns": [
           "apps/api/**/*.ts"
-        ]
+        ],
+        "fix": true
       }
     },
     "seed": {

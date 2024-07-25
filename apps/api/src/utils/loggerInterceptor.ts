@@ -6,7 +6,7 @@ import {
   NestInterceptor,
 } from '@nestjs/common';
 import { Observable } from 'rxjs';
-import { tap, catchError } from 'rxjs/operators';
+import { catchError, tap } from 'rxjs/operators';
 
 @Injectable()
 export class LoggingInterceptor implements NestInterceptor {
@@ -18,26 +18,22 @@ export class LoggingInterceptor implements NestInterceptor {
     const { method, url } = request;
     const startTime = Date.now();
 
-    return next
-      .handle()
-      .pipe(
-        tap(() => {
-          const { statusCode } = response;
-          const endTime = Date.now();
-          const elapsedTime = endTime - startTime;
-          this.logger.log(
-            `${method} ${url} ${statusCode} - ${elapsedTime}ms`
-          );
-        }),
-        catchError((error) => {
-          const { statusCode } = response;
-          const endTime = Date.now();
-          const elapsedTime = endTime - startTime;
-          this.logger.error(
-            `${method} ${url} ${statusCode} - ${elapsedTime}ms - Error: ${error.message}`
-          );
-          throw error;
-        }),
-      );
+    return next.handle().pipe(
+      tap(() => {
+        const { statusCode } = response;
+        const endTime = Date.now();
+        const elapsedTime = endTime - startTime;
+        this.logger.log(`${method} ${url} ${statusCode} - ${elapsedTime}ms`);
+      }),
+      catchError((error) => {
+        const { statusCode } = response;
+        const endTime = Date.now();
+        const elapsedTime = endTime - startTime;
+        this.logger.error(
+          `${method} ${url} ${statusCode} - ${elapsedTime}ms - Error: ${error.message}`
+        );
+        throw error;
+      })
+    );
   }
 }

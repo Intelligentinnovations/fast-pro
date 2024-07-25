@@ -1,30 +1,22 @@
 import { KyselyService } from '@backend-template/database';
 import { Injectable } from '@nestjs/common';
 
-import { paginate } from '../utils';
-import { DB, Invite } from '../utils';
-import { PaginationParams } from '../utils';
-import { CreateInvitePayload } from '../utils/schema/staff';
-import { UpdateInvitePayload } from '../utils/types/invite';
+import { DB } from '../utils';
 import { UpdateVendorPayload } from '../utils/types/vendor';
 @Injectable()
 export class VendorRepo {
-  constructor(
-    private client: KyselyService<DB>,
-  ) {
-  }
-  async updateVendor({vendorId, payload}: {
+  constructor(private client: KyselyService<DB>) {}
+  async updateVendor({
+    vendorId,
+    payload,
+  }: {
     vendorId: string;
-    payload: UpdateVendorPayload
+    payload: UpdateVendorPayload;
   }) {
     return this.client
       .updateTable('Vendor')
-      .set({...payload})
+      .set({ ...payload })
       .where('id', '=', vendorId)
-      .execute()
-  }
-
-  async getVendorByEmail() {
-
+      .execute();
   }
 }

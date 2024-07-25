@@ -23,8 +23,8 @@ import { AuthGuard } from '../libraries/guards/auth.guards';
 import { PermissionsGuard } from '../libraries/guards/permissions-guard.service';
 import {RequiredPermission} from '../libraries/guards/role.decorator'
 import { PaginationParams,Permission } from '../utils';
-import { StaffService } from './staff.service';
 import { CreateStaffAccountPayload, CreateStaffAccountSchema } from '../utils/schema/user';
+import { StaffService } from './staff.service';
 
 @ApiTags('Staff')
 @Controller('staff')
