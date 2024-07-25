@@ -7,7 +7,6 @@ const seeders: { [key: string]: { run: () => Promise<void> } } = {
 };
 
 const seeder = async (seedName?: string) => {
-  console.log("kjhgfdsasdfghjk");
   if (seedName) {
     const seed = seeders[seedName];
     if (!seed) return console.error('invalid seed name');

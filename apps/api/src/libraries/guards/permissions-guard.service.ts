@@ -5,7 +5,7 @@ import { UserData } from '../../utils/types/user.type';
 import { PERMISSION_KEY } from './role.decorator';
 
 @Injectable()
-export class RolesGuard implements CanActivate {
+export class PermissionsGuard implements CanActivate {
   constructor(
     private reflector: Reflector,
   ) {}
@@ -22,7 +22,7 @@ export class RolesGuard implements CanActivate {
     const { user}  = context.switchToHttp().getRequest();
     const { permissions: userPermission} = user as UserData
 
-    const hasPermission = userPermission.some(p => p.permissionName === requiredPermission)
+    const hasPermission = userPermission.some(p => p.name === requiredPermission)
     if(hasPermission) return  true
     throw new ForbiddenException('Insufficient permission');
   }

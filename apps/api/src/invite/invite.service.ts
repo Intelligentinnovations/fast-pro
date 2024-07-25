@@ -2,7 +2,7 @@ import { IServiceHelper } from '@backend-template/types';
 import { Injectable } from '@nestjs/common';
 
 import { InviteRepo } from '../repository/invite';
-import { CreateInvitePayload } from '../utils/schema/staff';
+import { CreateInvitePayload, UpdateInvitePayload } from '../utils/schema/staff';
 import { PaginationParams } from '../utils/types/paginationParams';
 
 
@@ -23,7 +23,7 @@ export class InviteService {
   }
 
   async delete (payload: {organizationId: string; id: string}): Promise<IServiceHelper>  {
-    const invite = await this.inviteRepo.fetchInvite(payload)
+    const invite = await this.inviteRepo.fetchOrganizationInvite(payload)
     if(invite?.status === 'USED') return {
       status: 'forbidden',
       message: 'The invite has already been used by a user'
@@ -35,7 +35,7 @@ export class InviteService {
   }
   }
 
-  async fetchStaff ({organizationId, paginationData}:
+  async fetchInvites ({organizationId, paginationData}:
                       {organizationId: string; paginationData: PaginationParams}): Promise<IServiceHelper>  {
     const invites = await this.inviteRepo.fetchInvites({
       pagination: paginationData,
@@ -46,6 +46,19 @@ export class InviteService {
     message: "Invited fetched successfully",
     data: invites
   }
+  }
+
+  async updateInvite(payload: UpdateInvitePayload & { inviteId: string; organizationId: string }) : Promise<IServiceHelper> {
+    const { inviteId, organizationId, ...data} = payload
+    await this.inviteRepo.updateInviteById({
+      id: inviteId,
+      organizationId,
+      payload: data
+    })
+    return {
+      status: 'successful',
+      message: 'Invite updated successfully'
+    }
   }
 
 

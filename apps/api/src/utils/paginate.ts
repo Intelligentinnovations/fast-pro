@@ -2,9 +2,9 @@ import { SelectQueryBuilder } from 'kysely';
 
 import { PaginationParams,PaginationResult } from './types/paginationParams';
 
-export async function paginate<T>(
-  queryBuilder: SelectQueryBuilder<any, any, any>,
-  pagination: PaginationParams,
+export async function paginate<T>({ queryBuilder, pagination, identifier}: {
+  identifier: string; pagination: PaginationParams, queryBuilder: SelectQueryBuilder<any, any, any>
+}
 ): Promise<PaginationResult<T>> {
   const { page = 1, limit = 10 } = pagination;
   const offset = (page - 1) * limit;
@@ -16,7 +16,7 @@ export async function paginate<T>(
   const countQuery = queryBuilder
     .clearSelect()
     .select((qb) =>
-      qb.fn.count('id')
+      qb.fn.count(identifier)
         .as('count')
     );
 

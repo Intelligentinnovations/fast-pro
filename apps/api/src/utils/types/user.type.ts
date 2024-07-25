@@ -4,30 +4,25 @@ export interface UpdateUserPayload {
   lastname?: string;
   firstname?: string;
   email: string;
+  isDeleted?: boolean
   status?: UserStatus;
-}
-
-export interface UserWithPermissions {
-  userId: string;
-  firstname: string;
-  lastname: string;
-  status: string;
-  password: string;
-  organizationId: string;
-  permissions: {
-    permissionId: string;
-    permissionName: string;
-  }[] ;
+  password?: string;
+  profileImage?: string;
+  title?:string
+  biography?:string
+  phoneNumber?:string
+  address?:string
 }
 
 export interface UserData  {
   userId: string;
+  email: string;
   firstname: string;
   lastname: string;
   status: string;
+  role: string;
   organizationId: string;
   permissions: {
-    permissionId: string;
-    permissionName: string
+    name: string
   }[]
 }

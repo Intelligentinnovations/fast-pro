@@ -18,22 +18,46 @@ model User {
   status         UserStatus   @default(UNVERIFIED)
   organizationId String
   Organization   Organization @relation(fields: [organizationId], references: [id])
+  departmentId   String?
+  department     Department?  @relation(fields: [departmentId], references: [id])
+  isDeleted      Boolean      @default(false)
+  profileImage   String?
+  title          String?
+  biography      String?
+  phoneNumber    String?
+  address        String?
   UserRole       UserRole[]
   createdAt      DateTime     @default(now()) @map("created_at")
   updatedAt      DateTime?    @updatedAt @map("updated_at")
 }
 
 model Organization {
-  id          String    @id @default(dbgenerated("gen_random_uuid()"))
+  id          String       @id @default(dbgenerated("gen_random_uuid()"))
   name        String
   companySize String
   sector      String
   logo        String?
   companyId   String?
+  description String?
+  websiteUrl  String?
   staff       User[]
-  createdAt   DateTime  @default(now()) @map("created_at")
-  updatedAt   DateTime? @updatedAt @map("updated_at")
+  email       String?
+  phoneNumber String?
+  address     String?
+  createdAt   DateTime     @default(now()) @map("created_at")
+  updatedAt   DateTime?    @updatedAt @map("updated_at")
   Invite      Invite[]
+  Departments Department[]
+}
+
+model Department {
+  id             String       @id @default(dbgenerated("gen_random_uuid()"))
+  organizationId String
+  Organization   Organization @relation(fields: [organizationId], references: [id])
+  name           String
+  staff          User[]
+  createdAt      DateTime     @default(now()) @map("created_at")
+  updatedAt      DateTime?    @updatedAt @map("updated_at")
 }
 
 model Role {
@@ -57,7 +81,7 @@ model Permission {
 model Invite {
   id             String       @id @default(dbgenerated("gen_random_uuid()"))
   organizationId String
-  organization   Organization @relation(fields: [organizationId], references: [id])
+  Organization   Organization @relation(fields: [organizationId], references: [id])
   email          String
   roleId         String
   departmentId   String

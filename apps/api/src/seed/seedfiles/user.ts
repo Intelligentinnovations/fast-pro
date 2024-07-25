@@ -4,16 +4,28 @@ import { UserStatus } from '../../utils/types';
 import { dbClient } from '../db';
 
 
+const organizationId = '1ab2610e-b332-46f3-b43e-f740912142e1';
+
 const UserSeed = {
   run: async () => {
     await dbClient
       .insertInto('Organization')
       .values({
-        id: '1ab2610e-b332-46f3-b43e-f740912142e1',
+        id: organizationId,
         companySize: '10-50',
         sector: 'Technology',
         name: 'SpaceX',
       })
+      .execute();
+
+
+    await dbClient
+      .insertInto('Department')
+      .values([{
+        id: '7c260f1f-747c-4ece-a9d1-2854f6d684a3',
+        name: 'Development',
+        organizationId,
+      }])
       .execute();
 
     await dbClient
