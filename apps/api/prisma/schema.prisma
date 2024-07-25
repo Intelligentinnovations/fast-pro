@@ -10,25 +10,27 @@ datasource db {
 }
 
 model User {
-  id             String       @id @default(dbgenerated("gen_random_uuid()"))
-  email          String       @unique
+  id             String        @id @default(dbgenerated("gen_random_uuid()"))
+  email          String        @unique
   firstname      String
   lastname       String
   password       String
-  status         UserStatus   @default(UNVERIFIED)
-  organizationId String
-  Organization   Organization @relation(fields: [organizationId], references: [id])
+  status         UserStatus    @default(UNVERIFIED)
+  organizationId String?
+  Organization   Organization? @relation(fields: [organizationId], references: [id])
+  vendorId       String?
+  Vendor         Vendor?       @relation(fields: [vendorId], references: [id])
   departmentId   String?
-  department     Department?  @relation(fields: [departmentId], references: [id])
-  isDeleted      Boolean      @default(false)
+  department     Department?   @relation(fields: [departmentId], references: [id])
+  isDeleted      Boolean       @default(false)
   profileImage   String?
   title          String?
   biography      String?
   phoneNumber    String?
   address        String?
   UserRole       UserRole[]
-  createdAt      DateTime     @default(now()) @map("created_at")
-  updatedAt      DateTime?    @updatedAt @map("updated_at")
+  createdAt      DateTime      @default(now()) @map("created_at")
+  updatedAt      DateTime?     @updatedAt @map("updated_at")
 }
 
 model Organization {
@@ -58,6 +60,24 @@ model Department {
   staff          User[]
   createdAt      DateTime     @default(now()) @map("created_at")
   updatedAt      DateTime?    @updatedAt @map("updated_at")
+}
+
+model Vendor {
+  id                         String       @id @default(dbgenerated("gen_random_uuid()"))
+  name                       String
+  sector                     String?
+  logo                       String?
+  description                String?
+  taxIdentificationNumber    String?
+  certificateOfRegistration  String?
+  businessRegistrationNumber String?
+  email                      String?
+  phoneNumber                String?
+  address                    String?
+  status                     VendorStatus @default(INACTIVE)
+  createdAt                  DateTime     @default(now()) @map("created_at")
+  updatedAt                  DateTime?    @updatedAt @map("updated_at")
+  User                       User[]
 }
 
 model Role {
@@ -117,6 +137,12 @@ enum UserStatus {
   ACTIVE
   DEACTIVATED
   DELETED
+}
+
+enum VendorStatus {
+  INACTIVE
+  ACTIVE
+  DEACTIVATED
 }
 
 enum InviteStatus {

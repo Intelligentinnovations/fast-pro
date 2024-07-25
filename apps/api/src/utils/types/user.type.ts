@@ -21,7 +21,8 @@ export interface UserData  {
   lastname: string;
   status: string;
   role: string;
-  organizationId: string;
+  organizationId?: string;
+  vendorId?: string;
   permissions: {
     name: string
   }[]

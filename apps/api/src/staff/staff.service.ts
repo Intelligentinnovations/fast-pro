@@ -7,7 +7,7 @@ import { InviteRepo } from '../repository/invite';
 import { UserRepo } from '../repository/user';
 import { SecretsService } from '../secrets/secrets.service';
 import { PaginationParams } from '../utils';
-import { CreateStaffAccountPayload } from '../utils/schema/auth';
+import { CreateStaffAccountPayload } from '../utils/schema/user';
 
 @Injectable()
 export class StaffService {

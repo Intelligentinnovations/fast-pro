@@ -4,7 +4,7 @@ import bcrypt from 'bcrypt'
 
 import { paginate } from '../utils';
 import { DB, Invite, PaginationParams, UpdateUserPayload, UserData,UserStatus } from '../utils';
-import { CreateAdminAccountPayload, CreateStaffAccountPayload } from '../utils/schema/auth';
+import { CreateAdminAccountPayload, CreateStaffAccountPayload, CreateVendorPayload } from '../utils/schema/user';
 
 @Injectable()
 export class UserRepo {
@@ -92,6 +92,7 @@ export class UserRepo {
         'User.lastname',
         'User.email',
         'User.organizationId',
+        'User.vendorId',
         'User.status',
         'Role.id as roleId',
         'Role.name as roleName',
@@ -102,6 +103,7 @@ export class UserRepo {
 
 
     return data.reduce((acc, row) => {
+      const companyId = row.organizationId ? 'organizationId' : 'vendorId';
       if (!acc) {
         acc = {
           userId: row.userId,
@@ -111,7 +113,7 @@ export class UserRepo {
           status: row.status,
           password: row.password,
           role: row.roleName,
-          organizationId: row.organizationId,
+          [companyId]: row.organizationId || row.vendorId ,
           permissions: [],
         };
       }
@@ -172,5 +174,54 @@ export class UserRepo {
       .executeTakeFirstOrThrow();
 
   }
+
+
+
+  async createVendor(data: CreateVendorPayload) {
+    const hashedPassword = await bcrypt.hash(data.password, 10)
+    return this.client.transaction().execute(async (trx) => {
+      const vendor = await trx
+        .insertInto('Vendor')
+        .values({
+          name: data.businessName
+        }).returning(["id", "name"])
+        .executeTakeFirstOrThrow()
+
+      const user = await trx
+        .insertInto('User')
+        .values({
+          firstname: data.firstname,
+          lastname: data.lastname,
+          email: data.email,
+          vendorId: vendor.id,
+          password: hashedPassword,
+        }).returning(['id', 'email', 'firstname', 'lastname'])
+        .executeTakeFirstOrThrow()
+
+      const vendorRole = await trx.selectFrom("Role")
+        .select("id")
+        .where("name", "=", "Vendor")
+        .executeTakeFirstOrThrow()
+
+      await trx.insertInto('UserRole').values({
+        roleId: vendorRole.id,
+        userId: user.id
+      }).returningAll()
+        .executeTakeFirstOrThrow()
+
+      const { firstname, lastname, id, email } = user
+      const { id: vendorId, name: vendorName } = vendor;
+      return {
+        firstname,
+        lastname,
+        id,
+        email,
+        vendorId,
+        vendorName
+      }
+    });
+
+  }
+
 
 }

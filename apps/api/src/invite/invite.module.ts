@@ -8,7 +8,7 @@ import { InviteService } from './invite.service';
   imports: [
   ],
   controllers: [InviteController],
-  providers: [InviteService, InviteRepo],
+  providers: [InviteService],
   exports: [InviteService],
 })
 export class InviteModule {}

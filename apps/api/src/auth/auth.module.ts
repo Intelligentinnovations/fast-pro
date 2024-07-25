@@ -1,6 +1,5 @@
 import { Module } from '@nestjs/common';
 
-import { InviteRepo } from '../repository/invite';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 
@@ -10,7 +9,7 @@ import { AuthService } from './auth.service';
   imports: [
   ],
   controllers: [AuthController],
-  providers: [AuthService, InviteRepo],
+  providers: [AuthService],
   exports: [AuthService],
 })
 export class AuthModule {}
