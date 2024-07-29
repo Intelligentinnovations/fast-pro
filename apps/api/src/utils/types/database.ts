@@ -42,8 +42,8 @@ export type Invite = {
 export type Organization = {
   id: Generated<string>;
   name: string;
-  companySize: string;
-  sector: string;
+  companySize: string | null;
+  sector: string | null;
   logo: string | null;
   companyId: string | null;
   description: string | null;

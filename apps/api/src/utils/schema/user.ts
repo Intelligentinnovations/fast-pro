@@ -6,13 +6,11 @@ export const CreateAdminAccountSchema = z.object({
   email: z.string().email(),
   password: z.string(),
   organizationName: z.string(),
-  sector: z.string(),
-  companySize: z.string(),
-  logo: z.string().optional(),
-  companyId: z.string().optional()
 });
 
-export type CreateAdminAccountPayload = z.infer<typeof CreateAdminAccountSchema>;
+export type CreateAdminAccountPayload = z.infer<
+  typeof CreateAdminAccountSchema
+>;
 
 export const CreateStaffAccountSchema = z.object({
   firstname: z.string(),
@@ -22,9 +20,9 @@ export const CreateStaffAccountSchema = z.object({
   inviteId: z.string(),
 });
 
-export type CreateStaffAccountPayload = z.infer<typeof CreateStaffAccountSchema>;
-
-
+export type CreateStaffAccountPayload = z.infer<
+  typeof CreateStaffAccountSchema
+>;
 
 export const CreateVendorSchema = z.object({
   firstname: z.string(),
@@ -32,11 +30,21 @@ export const CreateVendorSchema = z.object({
   businessName: z.string(),
   password: z.string(),
   email: z.string().email('Please enter a valid email'),
-  phoneNumber: z.string()
+  phoneNumber: z.string(),
 });
 
 export type CreateVendorPayload = z.infer<typeof CreateVendorSchema>;
 
+export const CompleteAdminRegistrationSchema = z.object({
+  sector: z.string(),
+  companySize: z.string(),
+  logo: z.string().optional(),
+  companyId: z.string().optional(),
+});
+
+export type CompleteAdminRegistrationPayload = z.infer<
+  typeof CompleteAdminRegistrationSchema
+>;
 
 export const CompleteVendorRegistrationSchema = z.object({
   businessRegistrationNumber: z.string(),
@@ -44,8 +52,9 @@ export const CompleteVendorRegistrationSchema = z.object({
   taxIdentificationNumber: z.string(),
   sector: z.string(),
   description: z.string().optional(),
-  logo: z.string().optional()
+  logo: z.string().optional(),
 });
 
-export type CompleteVendorRegistrationPayload = z.infer<typeof CompleteVendorRegistrationSchema>;
-
+export type CompleteVendorRegistrationPayload = z.infer<
+  typeof CompleteVendorRegistrationSchema
+>;
