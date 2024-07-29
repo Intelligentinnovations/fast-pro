@@ -19,7 +19,12 @@ import {
 } from '@nestjs/swagger';
 import { FastifyRequest } from 'fastify';
 
-import { AuthGuard } from '../libraries/guards/auth.guards';
+import {
+  AuthGuard,
+  PermissionsGuard,
+  RequiredPermission,
+} from '../libraries/guards';
+import { Permission } from '../utils';
 import {
   CompleteAdminRegistrationPayload,
   CompleteAdminRegistrationSchema,
@@ -52,7 +57,8 @@ export class UserController {
   }
 
   @Post('complete-admin-register')
-  @UseGuards(AuthGuard)
+  @UseGuards(AuthGuard, PermissionsGuard)
+  @RequiredPermission(Permission.UPDATE_ORGANIZATION_PROFILE)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Complete admin vendor registration.' })
   @ApiBody({
