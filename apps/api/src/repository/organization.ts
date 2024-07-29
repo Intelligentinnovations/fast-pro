@@ -2,21 +2,21 @@ import { KyselyService } from '@backend-template/database';
 import { Injectable } from '@nestjs/common';
 
 import { DB } from '../utils';
-import { UpdateVendorPayload } from '../utils/types/vendor';
+import { UpdateOrganizationPayload } from '../utils/types/organization';
 @Injectable()
-export class VendorRepo {
+export class OrganizationRepo {
   constructor(private client: KyselyService<DB>) {}
-  async updateVendor({
-    vendorId,
+  async updateOrganization({
+    organizationId,
     payload,
   }: {
-    vendorId: string;
-    payload: UpdateVendorPayload;
+    organizationId: string;
+    payload: UpdateOrganizationPayload;
   }) {
     return this.client
-      .updateTable('Vendor')
+      .updateTable('Organization')
       .set({ ...payload })
-      .where('id', '=', vendorId)
+      .where('id', '=', organizationId)
       .execute();
   }
 }

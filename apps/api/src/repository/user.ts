@@ -1,52 +1,64 @@
 import { KyselyService } from '@backend-template/database';
 import { Injectable } from '@nestjs/common';
-import bcrypt from 'bcrypt'
+import bcrypt from 'bcrypt';
 
 import { paginate } from '../utils';
-import { DB, Invite, PaginationParams, UpdateUserPayload, UserData,UserStatus } from '../utils';
-import { CreateAdminAccountPayload, CreateStaffAccountPayload, CreateVendorPayload } from '../utils/schema/user';
+import {
+  DB,
+  Invite,
+  PaginationParams,
+  UpdateUserPayload,
+  UserData,
+  UserStatus,
+} from '../utils';
+import {
+  CreateAdminAccountPayload,
+  CreateStaffAccountPayload,
+  CreateVendorPayload,
+} from '../utils/schema/user';
 
 @Injectable()
 export class UserRepo {
-  constructor(private client: KyselyService<DB>) {
-  }
+  constructor(private client: KyselyService<DB>) {}
   async createOrganization(data: CreateAdminAccountPayload) {
     const hashedPassword = await bcrypt.hash(data.password, 10);
     return this.client.transaction().execute(async (trx) => {
       const organization = await trx
         .insertInto('Organization')
         .values({
-          sector: data.sector,
-          logo: data.logo,
-          companySize: data.companySize,
-          companyId: data.companyId,
-          name: data.organizationName
-      }).returning(["id", "name"])
-        .executeTakeFirstOrThrow()
+          name: data.organizationName,
+        })
+        .returning(['id', 'name'])
+        .executeTakeFirstOrThrow();
 
       const user = await trx
         .insertInto('User')
         .values({
-        firstname: data.firstname,
-        lastname: data.lastname,
-        email: data.email,
-        organizationId: organization.id,
-        password: hashedPassword,
-      }).returning(['id', 'email', 'firstname', 'lastname'])
-        .executeTakeFirstOrThrow()
+          firstname: data.firstname,
+          lastname: data.lastname,
+          email: data.email,
+          organizationId: organization.id,
+          password: hashedPassword,
+        })
+        .returning(['id', 'email', 'firstname', 'lastname'])
+        .executeTakeFirstOrThrow();
 
-      const admin = await trx.selectFrom("Role")
-        .select("id")
-        .where("name", "=", "Admin")
-        .executeTakeFirstOrThrow()
+      const admin = await trx
+        .selectFrom('Role')
+        .select('id')
+        .where('name', '=', 'Admin')
+        .executeTakeFirstOrThrow();
 
-      await trx.insertInto('UserRole').values({
-        roleId: admin.id as string,
-        userId: user.id
-      }).returningAll()
-        .executeTakeFirstOrThrow()
+      await trx
+        .insertInto('UserRole')
+        .values({
+          roleId: admin.id as string,
+          userId: user.id,
+        })
+        .returningAll()
+        .executeTakeFirstOrThrow();
 
-      const { firstname, lastname, id, email } = user
+      const { firstname, lastname, id, email } = user;
       const { id: organizationId, name: organizationName } = organization;
       return {
         firstname,
@@ -54,28 +66,34 @@ export class UserRepo {
         id,
         email,
         organizationId,
-        organizationName
-      }
+        organizationName,
+      };
     });
-
   }
 
   async getUserByEmail(email: string) {
-    return this.client.selectFrom("User").selectAll().where('email', '=', email).executeTakeFirst()
+    return this.client
+      .selectFrom('User')
+      .selectAll()
+      .where('email', '=', email)
+      .executeTakeFirst();
   }
   async getUserById(id: string) {
-    return this.client.selectFrom("User").selectAll().where('id', '=', id).executeTakeFirst()
+    return this.client
+      .selectFrom('User')
+      .selectAll()
+      .where('id', '=', id)
+      .executeTakeFirst();
   }
 
   async updateUserByEmail(payload: UpdateUserPayload) {
     return this.client
       .updateTable('User')
       .set({
-        ...payload
+        ...payload,
       })
       .where('email', '=', payload.email)
       .executeTakeFirstOrThrow();
-
   }
 
   async getUserAndPermissions(email: string) {
@@ -101,7 +119,6 @@ export class UserRepo {
       .where('User.email', '=', email)
       .execute();
 
-
     return data.reduce((acc, row) => {
       const companyId = row.organizationId ? 'organizationId' : 'vendorId';
       if (!acc) {
@@ -113,7 +130,7 @@ export class UserRepo {
           status: row.status,
           password: row.password,
           role: row.roleName,
-          [companyId]: row.organizationId || row.vendorId ,
+          [companyId]: row.organizationId || row.vendorId,
           permissions: [],
         };
       }
@@ -123,12 +140,18 @@ export class UserRepo {
       });
 
       return acc;
-    }, null  as unknown as UserData & {password: string});
+    }, null as unknown as UserData & { password: string });
   }
 
-  async createStaff(data: CreateStaffAccountPayload & {
-    email: string; organizationId: string; departmentId: string;  hashedPassword: string; roleId: string
-  }) {
+  async createStaff(
+    data: CreateStaffAccountPayload & {
+      email: string;
+      organizationId: string;
+      departmentId: string;
+      hashedPassword: string;
+      roleId: string;
+    }
+  ) {
     return this.client.transaction().execute(async (trx) => {
       const user = await trx
         .insertInto('User')
@@ -140,52 +163,78 @@ export class UserRepo {
           departmentId: data.departmentId,
           organizationId: data.organizationId,
           password: data.hashedPassword,
-        }).returning(['id'])
-        .executeTakeFirstOrThrow()
+        })
+        .returning(['id'])
+        .executeTakeFirstOrThrow();
 
-      await trx.insertInto('UserRole').values({
-        roleId: data.roleId,
-        userId: user.id
-      }).returningAll()
-        .executeTakeFirstOrThrow()
+      await trx
+        .insertInto('UserRole')
+        .values({
+          roleId: data.roleId,
+          userId: user.id,
+        })
+        .returningAll()
+        .executeTakeFirstOrThrow();
     });
   }
-  async fetchOrganizationUsers({organizationId, pagination, currentUserId} : {
-    organizationId: string; pagination: PaginationParams; currentUserId: string
-  } ) {
-    const queryBuilder =  this.client
+  async fetchOrganizationUsers({
+    organizationId,
+    pagination,
+    currentUserId,
+  }: {
+    organizationId: string;
+    pagination: PaginationParams;
+    currentUserId: string;
+  }) {
+    const queryBuilder = this.client
       .selectFrom('User')
       .leftJoin('Department', 'User.departmentId', 'Department.id')
       .innerJoin('UserRole', 'User.id', 'UserRole.userId')
       .innerJoin('Role', 'UserRole.roleId', 'Role.id')
-      .select(['User.id', 'firstname', 'lastname', 'email', 'Department.name as department', 'Role.name as role', 'User.created_at as createdAt'])
+      .select([
+        'User.id',
+        'firstname',
+        'lastname',
+        'email',
+        'Department.name as department',
+        'Role.name as role',
+        'User.created_at as createdAt',
+      ])
       .where('User.organizationId', '=', organizationId)
       .where('User.id', '!=', currentUserId)
       .where('User.isDeleted', '==', false);
-    return paginate<Invite>({queryBuilder, pagination, identifier: 'User.id'});
+    return paginate<Invite>({
+      queryBuilder,
+      pagination,
+      identifier: 'User.id',
+    });
   }
 
-  async deleteUser({ userId, organizationId }:{userId: string; organizationId: string}) {
+  async deleteUser({
+    userId,
+    organizationId,
+  }: {
+    userId: string;
+    organizationId: string;
+  }) {
     return this.client
       .updateTable('User')
-      .set({isDeleted: true})
-      .where('id', '=',userId)
-      .where('organizationId', '=',organizationId)
+      .set({ isDeleted: true })
+      .where('id', '=', userId)
+      .where('organizationId', '=', organizationId)
       .executeTakeFirstOrThrow();
-
   }
 
-
-
   async createVendor(data: CreateVendorPayload) {
-    const hashedPassword = await bcrypt.hash(data.password, 10)
+    const hashedPassword = await bcrypt.hash(data.password, 10);
     return this.client.transaction().execute(async (trx) => {
       const vendor = await trx
         .insertInto('Vendor')
         .values({
-          name: data.businessName
-        }).returning(["id", "name"])
-        .executeTakeFirstOrThrow()
+          name: data.businessName,
+        })
+        .returning(['id', 'name'])
+        .executeTakeFirstOrThrow();
 
       const user = await trx
         .insertInto('User')
@@ -195,21 +244,26 @@ export class UserRepo {
           email: data.email,
           vendorId: vendor.id,
           password: hashedPassword,
-        }).returning(['id', 'email', 'firstname', 'lastname'])
-        .executeTakeFirstOrThrow()
+        })
+        .returning(['id', 'email', 'firstname', 'lastname'])
+        .executeTakeFirstOrThrow();
 
-      const vendorRole = await trx.selectFrom("Role")
-        .select("id")
-        .where("name", "=", "Vendor")
-        .executeTakeFirstOrThrow()
+      const vendorRole = await trx
+        .selectFrom('Role')
+        .select('id')
+        .where('name', '=', 'Vendor')
+        .executeTakeFirstOrThrow();
 
-      await trx.insertInto('UserRole').values({
-        roleId: vendorRole.id,
-        userId: user.id
-      }).returningAll()
-        .executeTakeFirstOrThrow()
+      await trx
+        .insertInto('UserRole')
+        .values({
+          roleId: vendorRole.id,
+          userId: user.id,
+        })
+        .returningAll()
+        .executeTakeFirstOrThrow();
 
-      const { firstname, lastname, id, email } = user
+      const { firstname, lastname, id, email } = user;
       const { id: vendorId, name: vendorName } = vendor;
       return {
         firstname,
@@ -217,11 +271,8 @@ export class UserRepo {
         id,
         email,
         vendorId,
-        vendorName
-      }
+        vendorName,
+      };
     });
-
   }
-
-
 }

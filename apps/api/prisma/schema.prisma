@@ -36,8 +36,8 @@ model User {
 model Organization {
   id          String       @id @default(dbgenerated("gen_random_uuid()"))
   name        String
-  companySize String
-  sector      String
+  companySize String?
+  sector      String?
   logo        String?
   companyId   String?
   description String?
