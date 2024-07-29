@@ -2,10 +2,10 @@ import { KyselyService } from '@backend-template/database';
 import { Injectable } from '@nestjs/common';
 import bcrypt from 'bcrypt';
 
-import { paginate } from '../utils';
 import {
   DB,
   Invite,
+  paginate,
   PaginationParams,
   UpdateUserPayload,
   UserData,
@@ -129,7 +129,6 @@ export class UserRepo {
           lastname: row.lastname,
           status: row.status,
           password: row.password,
-          role: row.roleName,
           [companyId]: row.organizationId || row.vendorId,
           permissions: [],
         };

@@ -1,7 +1,7 @@
 import { dbClient } from '../db';
 
-const ADMIN_ROLE_ID = '559f6c03-ff5a-4fcb-bbca-cf6e7e562dcd';
-const REQUESTER_ROLE_ID = '5052a4a6-93f2-40ef-94c6-0c84b81c1763';
+export const ADMIN_ROLE_ID = '559f6c03-ff5a-4fcb-bbca-cf6e7e562dcd';
+export const REQUESTER_ROLE_ID = '5052a4a6-93f2-40ef-94c6-0c84b81c1763';
 const APPROVER_ROLE_ID = 'cb3633c1-5a15-4cef-ac60-381efdcff5ac';
 const RECEIVER_ROLE_ID = '233ed840-43b7-4ba1-8a74-2618729b3d75';
 const VENDOR_ROLE_ID = '10cd5e45-da73-4ffe-bb77-2b4244d2fbb4';
