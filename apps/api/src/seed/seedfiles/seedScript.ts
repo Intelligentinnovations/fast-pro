@@ -1,9 +1,11 @@
+import ProposalCategorySeed from './proposalCategory';
 import Roles from './roles';
 import User from './user';
 
 const seeders: { [key: string]: { run: () => Promise<void> } } = {
   role: Roles,
   user: User,
+  proposalCategory: ProposalCategorySeed,
 };
 
 const seeder = async (seedName?: string) => {
@@ -19,8 +21,10 @@ const seeder = async (seedName?: string) => {
     }
   } else {
     try {
-      console.log("seeding started");
-      await Roles.run(); await User.run();
+      console.log('seeding started');
+      await ProposalCategorySeed.run();
+      await Roles.run();
+      await User.run();
     } catch (e) {
       console.error('seeding failed');
       console.error(e);

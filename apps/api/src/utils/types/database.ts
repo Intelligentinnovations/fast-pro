@@ -22,6 +22,12 @@ export const InviteStatus = {
   USED: 'USED',
 } as const;
 export type InviteStatus = (typeof InviteStatus)[keyof typeof InviteStatus];
+export const ProposalStatus = {
+  OPEN: 'OPEN',
+  CLOSED: 'CLOSED',
+} as const;
+export type ProposalStatus =
+  (typeof ProposalStatus)[keyof typeof ProposalStatus];
 export type Department = {
   id: Generated<string>;
   organizationId: string;
@@ -58,6 +64,28 @@ export type Permission = {
   id: Generated<string>;
   name: string;
   description: string;
+  created_at: Generated<Timestamp>;
+  updated_at: Timestamp | null;
+};
+export type Proposal = {
+  id: Generated<string>;
+  organizationId: string;
+  categoryId: string;
+  title: string;
+  dateRequired: Timestamp;
+  budgetAmount: string;
+  description: string;
+  termsAndCondition: string;
+  additionalDocument: string | null;
+  evaluationCriteria: string[];
+  eligibilityCriteria: string[];
+  status: Generated<ProposalStatus>;
+  created_at: Generated<Timestamp>;
+  updated_at: Timestamp | null;
+};
+export type ProposalCategory = {
+  id: Generated<string>;
+  name: string;
   created_at: Generated<Timestamp>;
   updated_at: Timestamp | null;
 };
@@ -119,6 +147,8 @@ export type DB = {
   Invite: Invite;
   Organization: Organization;
   Permission: Permission;
+  Proposal: Proposal;
+  ProposalCategory: ProposalCategory;
   Role: Role;
   RolePermission: RolePermission;
   User: User;
