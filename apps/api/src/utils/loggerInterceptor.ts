@@ -25,6 +25,7 @@ export class LoggingInterceptor implements NestInterceptor {
         const elapsedTime = endTime - startTime;
         this.logger.log(`${method} ${url} ${statusCode} - ${elapsedTime}ms`);
       }),
+
       catchError((error) => {
         const { statusCode } = response;
         const endTime = Date.now();

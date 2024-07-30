@@ -15,3 +15,22 @@ export const CreateProposalSchema = z.object({
 });
 
 export type CreateProposalPayload = z.infer<typeof CreateProposalSchema>;
+
+export const UpdateProposalSchema = z.object({
+  categoryId: z.string(),
+  title: z.string().optional(),
+  dateRequired: z
+    .string()
+    .refine((val) => !isNaN(Date.parse(val)), {
+      message: 'Invalid date format',
+    })
+    .optional(),
+  budgetAmount: z.string().optional(),
+  description: z.string().optional(),
+  termsAndCondition: z.string().optional(),
+  additionalDocument: z.string().optional(),
+  evaluationCriteria: z.array(string()).optional(),
+  eligibilityCriteria: z.array(string()).optional(),
+});
+
+export type UpdateProposalPayload = z.infer<typeof UpdateProposalSchema>;

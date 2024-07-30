@@ -63,8 +63,7 @@
       "executor": "@nx/js:node",
       "options": {
         "buildTarget": "api:build:seed",
-        "watch": false,
-        "args": "--myArg=someValue"
+        "watch": false
       }
     },
     "prisma-generate": {
