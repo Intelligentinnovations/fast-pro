@@ -1,3 +1,5 @@
+import { randomUUID } from 'crypto';
+
 import { dbClient } from '../db';
 
 export const ADMIN_ROLE_ID = '559f6c03-ff5a-4fcb-bbca-cf6e7e562dcd';
@@ -25,6 +27,9 @@ const CREATE_PRODUCT_PERMISSION_ID = 'd55be4c1-092f-469f-82ef-55a336399756';
 const UPDATE_ORGANIZATION_PROFILE_PERMISSION_ID =
   'd41ec131-80f9-4495-bd7e-3a097cfd83b9';
 const CREATE_PROPOSAL_PERMISSION_ID = 'eacdadc4-cb15-42e2-9e6e-d8619b2cef51';
+const VIEW_PROPOSAL_PERMISSION_ID = randomUUID();
+const UPDATE_PROPOSAL_PERMISSION_ID = randomUUID();
+const DELETE_PROPOSAL_PERMISSION_ID = randomUUID();
 
 const RolesSeed = {
   run: async () => {
@@ -131,6 +136,21 @@ const RolesSeed = {
           name: 'CREATE_PROPOSAL',
           description: 'Can create proposal',
         },
+        {
+          id: VIEW_PROPOSAL_PERMISSION_ID,
+          name: 'VIEW_PROPOSAL',
+          description: 'Can view proposal',
+        },
+        {
+          id: UPDATE_PROPOSAL_PERMISSION_ID,
+          name: 'UPDATE_PROPOSAL',
+          description: 'Can update proposal',
+        },
+        {
+          id: DELETE_PROPOSAL_PERMISSION_ID,
+          name: 'DELETE_PROPOSAL',
+          description: 'Can delete proposal',
+        },
       ])
       .execute();
 
@@ -170,6 +190,18 @@ const RolesSeed = {
         {
           roleId: ADMIN_ROLE_ID,
           permissionId: CREATE_PROPOSAL_PERMISSION_ID,
+        },
+        {
+          roleId: ADMIN_ROLE_ID,
+          permissionId: VIEW_PROPOSAL_PERMISSION_ID,
+        },
+        {
+          roleId: ADMIN_ROLE_ID,
+          permissionId: UPDATE_PROPOSAL_PERMISSION_ID,
+        },
+        {
+          roleId: ADMIN_ROLE_ID,
+          permissionId: DELETE_PROPOSAL_PERMISSION_ID,
         },
 
         // requester role
@@ -218,6 +250,10 @@ const RolesSeed = {
         {
           roleId: VENDOR_ROLE_ID,
           permissionId: DELETE_PRODUCT_PERMISSION_ID,
+        },
+        {
+          roleId: VENDOR_ROLE_ID,
+          permissionId: VIEW_PROPOSAL_PERMISSION_ID,
         },
       ])
       .execute();

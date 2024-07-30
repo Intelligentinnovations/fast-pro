@@ -3,7 +3,12 @@ import { ZodValidationPipe } from '@backend-template/http';
 import {
   Body,
   Controller,
+  Delete,
+  Get,
+  Param,
   Post,
+  Put,
+  Query,
   Request,
   UseGuards,
   UsePipes,
@@ -12,7 +17,9 @@ import {
   ApiBearerAuth,
   ApiBody,
   ApiCreatedResponse,
+  ApiOkResponse,
   ApiOperation,
+  ApiQuery,
   ApiTags,
 } from '@nestjs/swagger';
 import { FastifyRequest } from 'fastify';
@@ -25,14 +32,17 @@ import {
 import {
   CreateProposalPayload,
   CreateProposalSchema,
+  PaginationParams,
   Permission,
+  UpdateProposalPayload,
+  UpdateProposalSchema,
 } from '../utils';
 import { ProposalService } from './proposal.service';
 
 @ApiTags('Proposal')
 @ApiBearerAuth()
 @UseGuards(AuthGuard, PermissionsGuard)
-@Controller('proposal')
+@Controller('proposals')
 export class ProposalController {
   constructor(private readonly proposalServices: ProposalService) {}
 
@@ -52,6 +62,85 @@ export class ProposalController {
     const data = await this.proposalServices.createProposal({
       ...payload,
       organizationId: req.user?.organizationId as string,
+    });
+    return convertAndSendResponse(data);
+  }
+
+  @Put(':id')
+  @RequiredPermission(Permission.UPDATE_PROPOSAL)
+  @ApiOperation({ summary: 'Update proposal' })
+  @ApiBody({
+    description: 'Update Proposal payload',
+    schema: zodToApi(UpdateProposalSchema),
+  })
+  @ApiCreatedResponse({ description: 'Proposal updated successfully' })
+  @UsePipes(new ZodValidationPipe(UpdateProposalSchema))
+  async updateProposal(
+    @Body() payload: UpdateProposalPayload,
+    @Request() req: FastifyRequest,
+    @Param('id') id: string
+  ) {
+    const data = await this.proposalServices.updateProposal({
+      payload,
+      id,
+      organizationId: req.user?.organizationId as string,
+    });
+    return convertAndSendResponse(data);
+  }
+
+  @Get(':id')
+  @RequiredPermission(Permission.VIEW_PROPOSAL)
+  @ApiOperation({ summary: 'Fetch proposal details' })
+  @ApiOkResponse({ description: 'Proposal fetched successfully' })
+  async fetchProposal(
+    @Param('id') proposalId: string,
+    @Request() req: FastifyRequest
+  ) {
+    const data = await this.proposalServices.fetchProposal({
+      id: proposalId,
+      organizationId: req.user?.organizationId as string,
+    });
+    return convertAndSendResponse(data);
+  }
+
+  @Get('')
+  @RequiredPermission(Permission.VIEW_PROPOSAL)
+  @ApiQuery({
+    name: 'page',
+    required: false,
+    type: Number,
+    description: 'Page number',
+  })
+  @ApiQuery({
+    name: 'limit',
+    required: false,
+    type: Number,
+    description: 'Number of items per page',
+  })
+  @ApiOperation({ summary: 'Fetch proposals by type' })
+  @ApiOkResponse({ description: 'Proposals fetched successfully' })
+  async fetchProposals(
+    @Request() req: FastifyRequest,
+    @Query() pagination: PaginationParams
+  ) {
+    const data = await this.proposalServices.fetchProposals({
+      organizationId: req.user?.organizationId as string,
+      pagination,
+    });
+    return convertAndSendResponse(data);
+  }
+
+  @Delete(':id')
+  @RequiredPermission(Permission.DELETE_PROPOSAL)
+  @ApiOperation({ summary: 'Delete proposal' })
+  @ApiOkResponse({ description: 'Proposal deleted successfully' })
+  async deleteProposal(
+    @Request() req: FastifyRequest,
+    @Param('id') proposalId: string
+  ) {
+    const data = await this.proposalServices.deleteProposal({
+      organizationId: req.user?.organizationId as string,
+      id: proposalId,
     });
     return convertAndSendResponse(data);
   }
