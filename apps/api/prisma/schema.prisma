@@ -50,6 +50,7 @@ model Organization {
   updatedAt   DateTime?    @updatedAt @map("updated_at")
   Invite      Invite[]
   Departments Department[]
+  Proposal    Proposal[]
 }
 
 model Department {
@@ -110,6 +111,33 @@ model Invite {
   updatedAt      DateTime?    @updatedAt @map("updated_at")
 }
 
+model Proposal {
+  id                  String           @id @default(dbgenerated("gen_random_uuid()"))
+  organizationId      String
+  Organization        Organization     @relation(fields: [organizationId], references: [id])
+  categoryId          String
+  Category            ProposalCategory @relation(fields: [categoryId], references: [id])
+  title               String
+  dateRequired        DateTime
+  budgetAmount        Decimal          @db.Decimal(10, 2)
+  description         String
+  termsAndCondition   String
+  additionalDocument  String?
+  evaluationCriteria  String[]
+  eligibilityCriteria String[]
+  status              ProposalStatus   @default(OPEN)
+  createdAt           DateTime         @default(now()) @map("created_at")
+  updatedAt           DateTime?        @updatedAt @map("updated_at")
+}
+
+model ProposalCategory {
+  id        String     @id @default(dbgenerated("gen_random_uuid()"))
+  name      String
+  Proposal  Proposal[]
+  createdAt DateTime   @default(now()) @map("created_at")
+  updatedAt DateTime?  @updatedAt @map("updated_at")
+}
+
 model UserRole {
   userId    String
   roleId    String
@@ -148,4 +176,9 @@ enum VendorStatus {
 enum InviteStatus {
   PENDING
   USED
+}
+
+enum ProposalStatus {
+  OPEN
+  CLOSED
 }

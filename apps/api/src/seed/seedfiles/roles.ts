@@ -24,6 +24,7 @@ const CREATE_PRODUCT_PERMISSION_ID = 'd55be4c1-092f-469f-82ef-55a336399756';
 
 const UPDATE_ORGANIZATION_PROFILE_PERMISSION_ID =
   'd41ec131-80f9-4495-bd7e-3a097cfd83b9';
+const CREATE_PROPOSAL_PERMISSION_ID = 'eacdadc4-cb15-42e2-9e6e-d8619b2cef51';
 
 const RolesSeed = {
   run: async () => {
@@ -125,6 +126,11 @@ const RolesSeed = {
           name: 'UPDATE_ORGANIZATION_PROFILE',
           description: 'Can update organization profile',
         },
+        {
+          id: CREATE_PROPOSAL_PERMISSION_ID,
+          name: 'CREATE_PROPOSAL',
+          description: 'Can create proposal',
+        },
       ])
       .execute();
 
@@ -160,6 +166,10 @@ const RolesSeed = {
         {
           roleId: ADMIN_ROLE_ID,
           permissionId: UPDATE_ORGANIZATION_PROFILE_PERMISSION_ID,
+        },
+        {
+          roleId: ADMIN_ROLE_ID,
+          permissionId: CREATE_PROPOSAL_PERMISSION_ID,
         },
 
         // requester role
