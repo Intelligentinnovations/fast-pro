@@ -28,6 +28,13 @@ export const ProposalStatus = {
 } as const;
 export type ProposalStatus =
   (typeof ProposalStatus)[keyof typeof ProposalStatus];
+export const ProposalRequestStatus = {
+  SUBMITTED: 'SUBMITTED',
+  ACCEPTED: 'ACCEPTED',
+  REJECTED: 'REJECTED',
+} as const;
+export type ProposalRequestStatus =
+  (typeof ProposalRequestStatus)[keyof typeof ProposalRequestStatus];
 export type Department = {
   id: Generated<string>;
   organizationId: string;
@@ -86,6 +93,17 @@ export type Proposal = {
 export type ProposalCategory = {
   id: Generated<string>;
   name: string;
+  created_at: Generated<Timestamp>;
+  updated_at: Timestamp | null;
+};
+export type ProposalRequest = {
+  id: Generated<string>;
+  proposalId: string;
+  vendorId: string;
+  title: string;
+  summary: string;
+  attachments: string[];
+  status: Generated<ProposalRequestStatus>;
   created_at: Generated<Timestamp>;
   updated_at: Timestamp | null;
 };
@@ -149,6 +167,7 @@ export type DB = {
   Permission: Permission;
   Proposal: Proposal;
   ProposalCategory: ProposalCategory;
+  ProposalRequest: ProposalRequest;
   Role: Role;
   RolePermission: RolePermission;
   User: User;
