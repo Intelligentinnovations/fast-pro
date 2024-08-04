@@ -1,10 +1,13 @@
 import bcrypt from 'bcrypt';
+import { randomUUID } from 'crypto';
 
-import { UserStatus } from '../../utils/types';
+import { UserStatus } from '../../utils';
 import { dbClient } from '../db';
-import { ADMIN_ROLE_ID, REQUESTER_ROLE_ID } from './roles';
+import { ADMIN_ROLE_ID, REQUESTER_ROLE_ID, VENDOR_ROLE_ID } from './roles';
 
 const organizationId = '1ab2610e-b332-46f3-b43e-f740912142e1';
+const vendorId = randomUUID();
+const vendorUserId = randomUUID();
 
 const UserSeed = {
   run: async () => {
@@ -30,6 +33,15 @@ const UserSeed = {
       .execute();
 
     await dbClient
+      .insertInto('Vendor')
+      .values({
+        id: vendorId,
+        name: 'Dangote Groups',
+        status: 'ACTIVE',
+      })
+      .execute();
+
+    await dbClient
       .insertInto('User')
       .values([
         {
@@ -50,6 +62,15 @@ const UserSeed = {
           password: bcrypt.hashSync('password', 10),
           status: UserStatus.ACTIVE,
         },
+        {
+          id: vendorUserId,
+          firstname: 'Ira',
+          lastname: 'Gaines',
+          vendorId: vendorId,
+          email: 'ira@gaines.com',
+          password: bcrypt.hashSync('password', 10),
+          status: UserStatus.ACTIVE,
+        },
       ])
       .execute();
 
@@ -67,6 +88,10 @@ const UserSeed = {
         {
           userId: '8a93a86b-6f2b-4b17-b6d6-bdc5ca041a03',
           roleId: REQUESTER_ROLE_ID, // assign requester role
+        },
+        {
+          userId: vendorUserId,
+          roleId: VENDOR_ROLE_ID, // assign vendor role
         },
       ])
       .execute();

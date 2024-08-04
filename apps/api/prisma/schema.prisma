@@ -64,7 +64,7 @@ model Department {
 }
 
 model Vendor {
-  id                         String       @id @default(dbgenerated("gen_random_uuid()"))
+  id                         String            @id @default(dbgenerated("gen_random_uuid()"))
   name                       String
   sector                     String?
   logo                       String?
@@ -75,10 +75,11 @@ model Vendor {
   email                      String?
   phoneNumber                String?
   address                    String?
-  status                     VendorStatus @default(INACTIVE)
-  createdAt                  DateTime     @default(now()) @map("created_at")
-  updatedAt                  DateTime?    @updatedAt @map("updated_at")
+  status                     VendorStatus      @default(INACTIVE)
+  createdAt                  DateTime          @default(now()) @map("created_at")
+  updatedAt                  DateTime?         @updatedAt @map("updated_at")
   User                       User[]
+  ProposalRequest            ProposalRequest[]
 }
 
 model Role {
@@ -112,22 +113,23 @@ model Invite {
 }
 
 model Proposal {
-  id                  String           @id @default(dbgenerated("gen_random_uuid()"))
+  id                  String            @id @default(dbgenerated("gen_random_uuid()"))
   organizationId      String
-  Organization        Organization     @relation(fields: [organizationId], references: [id])
+  Organization        Organization      @relation(fields: [organizationId], references: [id])
   categoryId          String
-  Category            ProposalCategory @relation(fields: [categoryId], references: [id])
+  Category            ProposalCategory  @relation(fields: [categoryId], references: [id])
   title               String
   dateRequired        DateTime
-  budgetAmount        Decimal          @db.Decimal(10, 2)
+  budgetAmount        Decimal           @db.Decimal(10, 2)
   description         String
   termsAndCondition   String
   additionalDocument  String?
   evaluationCriteria  String[]
   eligibilityCriteria String[]
-  status              ProposalStatus   @default(OPEN)
-  createdAt           DateTime         @default(now()) @map("created_at")
-  updatedAt           DateTime?        @updatedAt @map("updated_at")
+  status              ProposalStatus    @default(OPEN)
+  createdAt           DateTime          @default(now()) @map("created_at")
+  updatedAt           DateTime?         @updatedAt @map("updated_at")
+  ProposalRequest     ProposalRequest[]
 }
 
 model ProposalCategory {
@@ -136,6 +138,20 @@ model ProposalCategory {
   Proposal  Proposal[]
   createdAt DateTime   @default(now()) @map("created_at")
   updatedAt DateTime?  @updatedAt @map("updated_at")
+}
+
+model ProposalRequest {
+  id          String                @id @default(dbgenerated("gen_random_uuid()"))
+  proposalId  String
+  Proposal    Proposal              @relation(fields: [proposalId], references: [id])
+  vendorId    String
+  Vendor      Vendor                @relation(fields: [vendorId], references: [id])
+  title       String
+  summary     String
+  attachments String[]
+  status      ProposalRequestStatus @default(SUBMITTED)
+  createdAt   DateTime              @default(now()) @map("created_at")
+  updatedAt   DateTime?             @updatedAt @map("updated_at")
 }
 
 model UserRole {
@@ -181,4 +197,10 @@ enum InviteStatus {
 enum ProposalStatus {
   OPEN
   CLOSED
+}
+
+enum ProposalRequestStatus {
+  SUBMITTED
+  ACCEPTED
+  REJECTED
 }

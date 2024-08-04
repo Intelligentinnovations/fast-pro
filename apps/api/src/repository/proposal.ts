@@ -23,21 +23,14 @@ export class ProposalRepo {
       .execute();
   }
 
-  async fetchProposal({
-    id,
-    organizationId,
-  }: {
-    id: string;
-    organizationId: string;
-  }) {
+  async fetchProposal(id: string) {
     return this.client
       .selectFrom('Proposal')
       .selectAll()
-      .where('organizationId', '=', organizationId)
       .where('id', '=', id)
       .executeTakeFirstOrThrow();
   }
-  async fetchProposals({
+  async fetchOrganizationProposals({
     pagination,
     organizationId,
   }: {
@@ -46,10 +39,56 @@ export class ProposalRepo {
   }) {
     const queryBuilder = this.client
       .selectFrom('Proposal')
-      .selectAll()
+      .innerJoin(
+        'ProposalCategory',
+        'Proposal.categoryId',
+        'ProposalCategory.id'
+      )
+      .innerJoin('Organization', 'Proposal.organizationId', 'Organization.id')
+      .select([
+        'Proposal.id',
+        'title',
+        'Proposal.description as description',
+        'Proposal.created_at as createdAt',
+        'Proposal.status',
+        'ProposalCategory.name as categoryName',
+        'dateRequired',
+        'Organization.name as organizationName',
+      ])
       .where('organizationId', '=', organizationId);
 
-    return paginate<Proposal>({ queryBuilder, pagination, identifier: 'id' });
+    return paginate<Proposal>({
+      queryBuilder,
+      pagination,
+      identifier: 'Proposal.id',
+    });
+  }
+
+  async fetchAllProposals(pagination: PaginationParams) {
+    const queryBuilder = this.client
+      .selectFrom('Proposal')
+      .innerJoin(
+        'ProposalCategory',
+        'Proposal.categoryId',
+        'ProposalCategory.id'
+      )
+      .innerJoin('Organization', 'Proposal.organizationId', 'Organization.id')
+      .select([
+        'Proposal.id',
+        'title',
+        'Proposal.description as description',
+        'Proposal.created_at as createdAt',
+        'Proposal.status',
+        'ProposalCategory.name as categoryName',
+        'dateRequired',
+        'Organization.name as organizationName',
+      ])
+      .where('status', '=', 'OPEN');
+    return paginate<Proposal>({
+      queryBuilder,
+      pagination,
+      identifier: 'Proposal.id',
+    });
   }
 
   async deleteProposal({
