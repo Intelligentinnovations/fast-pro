@@ -22,28 +22,36 @@ export class ProposalService {
     };
   }
 
-  async fetchProposal(payload: {
-    id: string;
-    organizationId: string;
-  }): Promise<IServiceHelper> {
-    const proposal = await this.proposalRepo.fetchProposal(payload);
+  async fetchProposal(id: string): Promise<IServiceHelper> {
+    const proposal = await this.proposalRepo.fetchProposal(id);
     return {
       status: 'created',
       message: 'Proposal fetched successfully',
       data: proposal,
     };
   }
-  async fetchProposals({
+  async fetchOrganizationProposals({
     organizationId,
     pagination,
   }: {
     pagination: PaginationParams;
     organizationId: string;
   }): Promise<IServiceHelper> {
-    const proposals = await this.proposalRepo.fetchProposals({
+    const proposals = await this.proposalRepo.fetchOrganizationProposals({
       pagination,
       organizationId,
     });
+    return {
+      status: 'successful',
+      message: 'Proposals fetched successfully',
+      data: proposals,
+    };
+  }
+
+  async fetchAllProposals(
+    pagination: PaginationParams
+  ): Promise<IServiceHelper> {
+    const proposals = await this.proposalRepo.fetchAllProposals(pagination);
     return {
       status: 'successful',
       message: 'Proposals fetched successfully',

@@ -7,13 +7,14 @@ import { redisStore } from 'cache-manager-redis-yet';
 import { AuthModule } from './auth/auth.module';
 import { InviteModule } from './invite/invite.module';
 import { LibrariesModule } from './libraries/libraries';
+import { ProposalModule } from './proposal/proposal.module';
+import { ProposalRequestModule } from './proposalRequest/proposalRequest.module';
 import { RepositoryModule } from './repository/repository.module';
 import { SecretsModule } from './secrets/secrets.module';
 import { SecretsService } from './secrets/secrets.service';
 import { StaffModule } from './staff/staff.module';
 import { UserModule } from './user/user.module';
 import { LoggingInterceptor } from './utils/loggerInterceptor';
-import { ProposalModule } from './proposal/proposal.module';
 
 @Module({
   imports: [
@@ -37,6 +38,7 @@ import { ProposalModule } from './proposal/proposal.module';
     StaffModule,
     UserModule,
     ProposalModule,
+    ProposalRequestModule,
     RepositoryModule,
   ],
   providers: [

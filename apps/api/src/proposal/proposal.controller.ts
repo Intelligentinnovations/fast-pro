@@ -92,13 +92,32 @@ export class ProposalController {
   @RequiredPermission(Permission.VIEW_PROPOSAL)
   @ApiOperation({ summary: 'Fetch proposal details' })
   @ApiOkResponse({ description: 'Proposal fetched successfully' })
-  async fetchProposal(
-    @Param('id') proposalId: string,
-    @Request() req: FastifyRequest
+  async fetchProposal(@Param('id') proposalId: string) {
+    const data = await this.proposalServices.fetchProposal(proposalId);
+    return convertAndSendResponse(data);
+  }
+
+  @Get('organization')
+  @RequiredPermission(Permission.VIEW_PROPOSAL)
+  @ApiQuery({
+    name: 'page',
+    type: Number,
+    description: 'Page number',
+  })
+  @ApiQuery({
+    name: 'limit',
+    type: Number,
+    description: 'Number of items per page',
+  })
+  @ApiOperation({ summary: 'Fetch organization proposals' })
+  @ApiOkResponse({ description: 'Proposals fetched successfully' })
+  async fetchOrganizationProposals(
+    @Request() req: FastifyRequest,
+    @Query() pagination: PaginationParams
   ) {
-    const data = await this.proposalServices.fetchProposal({
-      id: proposalId,
+    const data = await this.proposalServices.fetchOrganizationProposals({
       organizationId: req.user?.organizationId as string,
+      pagination,
     });
     return convertAndSendResponse(data);
   }
@@ -107,26 +126,21 @@ export class ProposalController {
   @RequiredPermission(Permission.VIEW_PROPOSAL)
   @ApiQuery({
     name: 'page',
-    required: false,
     type: Number,
     description: 'Page number',
   })
   @ApiQuery({
     name: 'limit',
-    required: false,
     type: Number,
     description: 'Number of items per page',
   })
-  @ApiOperation({ summary: 'Fetch proposals by type' })
+  @ApiOperation({ summary: 'Fetch all proposals' })
   @ApiOkResponse({ description: 'Proposals fetched successfully' })
   async fetchProposals(
     @Request() req: FastifyRequest,
     @Query() pagination: PaginationParams
   ) {
-    const data = await this.proposalServices.fetchProposals({
-      organizationId: req.user?.organizationId as string,
-      pagination,
-    });
+    const data = await this.proposalServices.fetchAllProposals(pagination);
     return convertAndSendResponse(data);
   }
 
