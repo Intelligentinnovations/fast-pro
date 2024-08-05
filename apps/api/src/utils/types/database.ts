@@ -35,6 +35,12 @@ export const ProposalRequestStatus = {
 } as const;
 export type ProposalRequestStatus =
   (typeof ProposalRequestStatus)[keyof typeof ProposalRequestStatus];
+export const TaskStatus = {
+  TODO: 'TODO',
+  IN_PROGRESS: 'IN_PROGRESS',
+  COMPLETED: 'COMPLETED',
+} as const;
+export type TaskStatus = (typeof TaskStatus)[keyof typeof TaskStatus];
 export type Department = {
   id: Generated<string>;
   organizationId: string;
@@ -119,6 +125,17 @@ export type RolePermission = {
   created_at: Generated<Timestamp>;
   updated_at: Timestamp | null;
 };
+export type Task = {
+  id: Generated<string>;
+  assigneeId: string;
+  assignerId: string;
+  organizationId: string | null;
+  title: string;
+  priority: string;
+  status: Generated<TaskStatus>;
+  created_at: Generated<Timestamp>;
+  updated_at: Timestamp | null;
+};
 export type User = {
   id: Generated<string>;
   email: string;
@@ -170,6 +187,7 @@ export type DB = {
   ProposalRequest: ProposalRequest;
   Role: Role;
   RolePermission: RolePermission;
+  Task: Task;
   User: User;
   UserRole: UserRole;
   Vendor: Vendor;

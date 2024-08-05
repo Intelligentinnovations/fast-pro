@@ -10,27 +10,29 @@ datasource db {
 }
 
 model User {
-  id             String        @id @default(dbgenerated("gen_random_uuid()"))
-  email          String        @unique
-  firstname      String
-  lastname       String
-  password       String
-  status         UserStatus    @default(UNVERIFIED)
-  organizationId String?
-  Organization   Organization? @relation(fields: [organizationId], references: [id])
-  vendorId       String?
-  Vendor         Vendor?       @relation(fields: [vendorId], references: [id])
-  departmentId   String?
-  department     Department?   @relation(fields: [departmentId], references: [id])
-  isDeleted      Boolean       @default(false)
-  profileImage   String?
-  title          String?
-  biography      String?
-  phoneNumber    String?
-  address        String?
-  UserRole       UserRole[]
-  createdAt      DateTime      @default(now()) @map("created_at")
-  updatedAt      DateTime?     @updatedAt @map("updated_at")
+  id              String        @id @default(dbgenerated("gen_random_uuid()"))
+  email           String        @unique
+  firstname       String
+  lastname        String
+  password        String
+  status          UserStatus    @default(UNVERIFIED)
+  organizationId  String?
+  Organization    Organization? @relation(fields: [organizationId], references: [id])
+  vendorId        String?
+  Vendor          Vendor?       @relation(fields: [vendorId], references: [id])
+  departmentId    String?
+  department      Department?   @relation(fields: [departmentId], references: [id])
+  isDeleted       Boolean       @default(false)
+  profileImage    String?
+  title           String?
+  biography       String?
+  phoneNumber     String?
+  address         String?
+  UserRole        UserRole[]
+  createdAt       DateTime      @default(now()) @map("created_at")
+  updatedAt       DateTime?     @updatedAt @map("updated_at")
+  assignedTasks   Task[]        @relation("AssignedTasks")
+  assignedTasksBy Task[]        @relation("AssignedTasksBy")
 }
 
 model Organization {
@@ -51,6 +53,7 @@ model Organization {
   Invite      Invite[]
   Departments Department[]
   Proposal    Proposal[]
+  Task        Task[]
 }
 
 model Department {
@@ -154,6 +157,21 @@ model ProposalRequest {
   updatedAt   DateTime?             @updatedAt @map("updated_at")
 }
 
+model Task {
+  id             String        @id @default(dbgenerated("gen_random_uuid()"))
+  assigneeId     String
+  Assignee       User          @relation("AssignedTasks", fields: [assigneeId], references: [id])
+  assignerId     String
+  Assigner       User          @relation("AssignedTasksBy", fields: [assignerId], references: [id])
+  organizationId String?
+  Organization   Organization? @relation(fields: [organizationId], references: [id])
+  title          String
+  priority       String
+  status         TaskStatus    @default(TODO)
+  createdAt      DateTime      @default(now()) @map("created_at")
+  updatedAt      DateTime?     @updatedAt @map("updated_at")
+}
+
 model UserRole {
   userId    String
   roleId    String
@@ -203,4 +221,10 @@ enum ProposalRequestStatus {
   SUBMITTED
   ACCEPTED
   REJECTED
+}
+
+enum TaskStatus {
+  TODO
+  IN_PROGRESS
+  COMPLETED
 }

@@ -6,6 +6,7 @@ import { ProposalRepo } from './proposal';
 import { ProposalRequestRepo } from './proposalRequest';
 import { UserRepo } from './user';
 import { VendorRepo } from './vendor';
+import { TaskRepo } from './task';
 
 @Global()
 @Module({
@@ -16,6 +17,7 @@ import { VendorRepo } from './vendor';
     ProposalRepo,
     OrganizationRepo,
     ProposalRequestRepo,
+    TaskRepo,
   ],
   exports: [
     InviteRepo,
@@ -24,6 +26,7 @@ import { VendorRepo } from './vendor';
     ProposalRepo,
     OrganizationRepo,
     ProposalRequestRepo,
+    TaskRepo,
   ],
 })
 export class RepositoryModule {}

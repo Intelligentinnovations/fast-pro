@@ -50,7 +50,7 @@ export class InviteController {
   @RequiredPermission(Permission.CREATE_INVITE)
   @ApiOperation({ summary: 'Invite staff member' })
   @ApiBody({
-    description: 'Admin Registration',
+    description: 'Invite staff to join fast organization',
     schema: zodToApi(CreateInviteSchema),
   })
   @ApiCreatedResponse({ description: `We have sent an invite to staff email` })
