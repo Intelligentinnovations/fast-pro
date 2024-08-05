@@ -76,7 +76,7 @@ export class UserService {
     const { vendorId, ...updatePayload } = payload;
     await this.vendorRepo.updateVendor({
       vendorId,
-      payload: { ...updatePayload, status: 'ACTIVE' },
+      payload: { ...updatePayload, status: 'active' },
     });
     return {
       status: 'successful',

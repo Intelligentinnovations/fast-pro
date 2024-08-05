@@ -15,7 +15,7 @@ model User {
   firstname       String
   lastname        String
   password        String
-  status          UserStatus    @default(UNVERIFIED)
+  status          UserStatus    @default(unverified)
   organizationId  String?
   Organization    Organization? @relation(fields: [organizationId], references: [id])
   vendorId        String?
@@ -78,7 +78,7 @@ model Vendor {
   email                      String?
   phoneNumber                String?
   address                    String?
-  status                     VendorStatus      @default(INACTIVE)
+  status                     VendorStatus      @default(inactive)
   createdAt                  DateTime          @default(now()) @map("created_at")
   updatedAt                  DateTime?         @updatedAt @map("updated_at")
   User                       User[]
@@ -110,7 +110,7 @@ model Invite {
   email          String
   roleId         String
   departmentId   String
-  status         InviteStatus @default(PENDING)
+  status         InviteStatus @default(pending)
   createdAt      DateTime     @default(now()) @map("created_at")
   updatedAt      DateTime?    @updatedAt @map("updated_at")
 }
@@ -129,7 +129,7 @@ model Proposal {
   additionalDocument  String?
   evaluationCriteria  String[]
   eligibilityCriteria String[]
-  status              ProposalStatus    @default(OPEN)
+  status              ProposalStatus    @default(open)
   createdAt           DateTime          @default(now()) @map("created_at")
   updatedAt           DateTime?         @updatedAt @map("updated_at")
   ProposalRequest     ProposalRequest[]
@@ -152,7 +152,7 @@ model ProposalRequest {
   title       String
   summary     String
   attachments String[]
-  status      ProposalRequestStatus @default(SUBMITTED)
+  status      ProposalRequestStatus @default(submitted)
   createdAt   DateTime              @default(now()) @map("created_at")
   updatedAt   DateTime?             @updatedAt @map("updated_at")
 }
@@ -167,7 +167,7 @@ model Task {
   Organization   Organization? @relation(fields: [organizationId], references: [id])
   title          String
   priority       String
-  status         TaskStatus    @default(TODO)
+  status         TaskStatus    @default(todo)
   createdAt      DateTime      @default(now()) @map("created_at")
   updatedAt      DateTime?     @updatedAt @map("updated_at")
 }
@@ -195,36 +195,36 @@ model RolePermission {
 }
 
 enum UserStatus {
-  UNVERIFIED
-  ACTIVE
-  DEACTIVATED
-  DELETED
+  unverified
+  active
+  deactivated
+  deleted
 }
 
 enum VendorStatus {
-  INACTIVE
-  ACTIVE
-  DEACTIVATED
+  inactive
+  active
+  deactivated
 }
 
 enum InviteStatus {
-  PENDING
-  USED
+  pending
+  used
 }
 
 enum ProposalStatus {
-  OPEN
-  CLOSED
+  open
+  closed
 }
 
 enum ProposalRequestStatus {
-  SUBMITTED
-  ACCEPTED
-  REJECTED
+  submitted
+  accepted
+  rejected
 }
 
 enum TaskStatus {
-  TODO
-  IN_PROGRESS
-  COMPLETED
+  todo
+  inProgres
+  completed
 }

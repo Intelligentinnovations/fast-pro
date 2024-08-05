@@ -126,7 +126,7 @@ export class AuthService {
 
     if (originalOtpKey === `${payload.email}-signup-verification`) {
       await this.userRepo.updateUserByEmail({
-        status: UserStatus.ACTIVE,
+        status: UserStatus.active,
         email: payload.email,
       });
 

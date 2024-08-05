@@ -158,7 +158,7 @@ export class UserRepo {
           firstname: data.firstname,
           lastname: data.lastname,
           email: data.email,
-          status: UserStatus.ACTIVE,
+          status: UserStatus.active,
           departmentId: data.departmentId,
           organizationId: data.organizationId,
           password: data.hashedPassword,

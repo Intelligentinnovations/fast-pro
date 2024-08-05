@@ -92,14 +92,14 @@ export class ProposalRequestRepo {
       const proposalRequest = await trx
         .updateTable('ProposalRequest')
         .returning('proposalId')
-        .set({ status: 'ACCEPTED' })
+        .set({ status: 'accepted' })
         .where('id', '=', proposalRequestId)
-        .where('status', '=', 'SUBMITTED')
+        .where('status', '=', 'submitted')
         .executeTakeFirstOrThrow();
 
       await trx
         .updateTable('Proposal')
-        .set({ status: 'CLOSED' })
+        .set({ status: 'closed' })
         .where('id', '=', proposalRequest.proposalId)
         .where('organizationId', '=', organizationId)
         .executeTakeFirstOrThrow();
@@ -123,10 +123,10 @@ export class ProposalRequestRepo {
           .select('ProposalRequest.id as id')
           .where('ProposalRequest.id', '=', proposalRequestId)
           .where('Proposal.organizationId', '=', organizationId)
-          .where('ProposalRequest.status', '=', 'SUBMITTED')
+          .where('ProposalRequest.status', '=', 'submitted')
       )
       .updateTable('ProposalRequest')
-      .set({ status: 'REJECTED' })
+      .set({ status: 'rejected' })
       .where('ProposalRequest.id', 'in', (db) =>
         db.selectFrom('filtered_proposal_request').select('id')
       )

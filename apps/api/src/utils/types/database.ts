@@ -5,40 +5,40 @@ export type Generated<T> = T extends ColumnType<infer S, infer I, infer U>
 export type Timestamp = ColumnType<Date, Date | string, Date | string>;
 
 export const UserStatus = {
-  UNVERIFIED: 'UNVERIFIED',
-  ACTIVE: 'ACTIVE',
-  DEACTIVATED: 'DEACTIVATED',
-  DELETED: 'DELETED',
+  unverified: 'unverified',
+  active: 'active',
+  deactivated: 'deactivated',
+  deleted: 'deleted',
 } as const;
 export type UserStatus = (typeof UserStatus)[keyof typeof UserStatus];
 export const VendorStatus = {
-  INACTIVE: 'INACTIVE',
-  ACTIVE: 'ACTIVE',
-  DEACTIVATED: 'DEACTIVATED',
+  inactive: 'inactive',
+  active: 'active',
+  deactivated: 'deactivated',
 } as const;
 export type VendorStatus = (typeof VendorStatus)[keyof typeof VendorStatus];
 export const InviteStatus = {
-  PENDING: 'PENDING',
-  USED: 'USED',
+  pending: 'pending',
+  used: 'used',
 } as const;
 export type InviteStatus = (typeof InviteStatus)[keyof typeof InviteStatus];
 export const ProposalStatus = {
-  OPEN: 'OPEN',
-  CLOSED: 'CLOSED',
+  open: 'open',
+  closed: 'closed',
 } as const;
 export type ProposalStatus =
   (typeof ProposalStatus)[keyof typeof ProposalStatus];
 export const ProposalRequestStatus = {
-  SUBMITTED: 'SUBMITTED',
-  ACCEPTED: 'ACCEPTED',
-  REJECTED: 'REJECTED',
+  submitted: 'submitted',
+  accepted: 'accepted',
+  rejected: 'rejected',
 } as const;
 export type ProposalRequestStatus =
   (typeof ProposalRequestStatus)[keyof typeof ProposalRequestStatus];
 export const TaskStatus = {
-  TODO: 'TODO',
-  IN_PROGRESS: 'IN_PROGRESS',
-  COMPLETED: 'COMPLETED',
+  todo: 'todo',
+  inProgres: 'inProgres',
+  completed: 'completed',
 } as const;
 export type TaskStatus = (typeof TaskStatus)[keyof typeof TaskStatus];
 export type Department = {

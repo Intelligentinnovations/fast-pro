@@ -72,7 +72,7 @@ export class InviteRepo {
       .selectFrom('Invite')
       .selectAll()
       .where('id', '=', id)
-      .where('status', '=', 'PENDING')
+      .where('status', '=', 'pending')
       .executeTakeFirst();
   }
   async updateInviteById({
@@ -89,7 +89,7 @@ export class InviteRepo {
       .set({ ...payload })
       .where('id', '=', id)
       .where('organizationId', '=', organizationId)
-      .where('status', '=', 'PENDING')
+      .where('status', '=', 'pending')
       .execute();
   }
 }
