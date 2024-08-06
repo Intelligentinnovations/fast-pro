@@ -3,8 +3,11 @@ import { ZodValidationPipe } from '@backend-template/http';
 import {
   Body,
   Controller,
+  Delete,
   Get,
+  Param,
   Post,
+  Put,
   Query,
   Request,
   UseGuards,
@@ -16,6 +19,7 @@ import {
   ApiConflictResponse,
   ApiCreatedResponse,
   ApiForbiddenResponse,
+  ApiNotFoundResponse,
   ApiOkResponse,
   ApiOperation,
   ApiQuery,
@@ -23,11 +27,18 @@ import {
 } from '@nestjs/swagger';
 import { FastifyRequest } from 'fastify';
 
-import { AuthGuard, PermissionsGuard } from '../libraries/guards';
+import {
+  AuthGuard,
+  PermissionsGuard,
+  RequiredPermission,
+} from '../libraries/guards';
 import {
   CreateTaskPayload,
   CreateTaskSchema,
   PaginationParams,
+  Permission,
+  UpdateTaskPayload,
+  UpdateTaskSchema,
 } from '../utils';
 import { TaskService } from './task.service';
 
@@ -39,7 +50,7 @@ export class TaskController {
   constructor(private readonly taskService: TaskService) {}
 
   @Post('')
-  // @RequiredPermission(Permission.CREATE_TASK)
+  @RequiredPermission(Permission.CREATE_TASK)
   @ApiOperation({ summary: 'Assign task to a staff member' })
   @ApiBody({
     description: 'Create and assign task payload',
@@ -62,44 +73,44 @@ export class TaskController {
     return convertAndSendResponse(data);
   }
 
-  // @Put('/:id')
-  // @RequiredPermission(Permission.UPDATE_TASK)
-  // @ApiOperation({ summary: 'Update pending task' })
-  // @ApiBody({
-  //   description: 'Update invite payload',
-  //   schema: zodToApi(UpdateInviteSchema),
-  // })
-  // @ApiOkResponse({ description: 'Invite updated successfully' })
-  // @UsePipes(new ZodValidationPipe(UpdateInviteSchema))
-  // async updateInvite(
-  //   @Body() payload: UpdateInvitePayload,
-  //   @Param('id') inviteId: string,
-  //   @Request() req: FastifyRequest
-  // ) {
-  //   const data = await this.taskService.updateInvite({
-  //     ...payload,
-  //     inviteId,
-  //     organizationId: req.user?.organizationId as string,
-  //   });
-  //   return convertAndSendResponse(data);
-  // }
-  //
-  // @Delete('/:id')
-  // @RequiredPermission(Permission.DELETE_INVITE)
-  // @ApiOperation({ summary: 'Delete invite' })
-  // @ApiOkResponse({ description: 'Invite deleted successfully' })
-  // @ApiForbiddenResponse({ description: 'Insufficient permission' })
-  // @ApiNotFoundResponse({ description: 'Invite not found' })
-  // async delete(@Param('id') id: string, @Request() req: FastifyRequest) {
-  //   const data = await this.taskService.delete({
-  //     id,
-  //     organizationId: req.user?.organizationId as string,
-  //   });
-  //   return convertAndSendResponse(data);
-  // }
-  //
+  @Put('/:id')
+  @RequiredPermission(Permission.UPDATE_TASK)
+  @ApiOperation({ summary: 'Update pending task' })
+  @ApiBody({
+    description: 'Update task payload',
+    schema: zodToApi(UpdateTaskSchema),
+  })
+  @ApiOkResponse({ description: 'Task updated successfully' })
+  @UsePipes(new ZodValidationPipe(UpdateTaskSchema))
+  async updateTask(
+    @Body() payload: UpdateTaskPayload,
+    @Param('id') taskId: string,
+    @Request() req: FastifyRequest
+  ) {
+    const data = await this.taskService.updateTask({
+      ...payload,
+      taskId,
+      organizationId: req.user?.organizationId as string,
+    });
+    return convertAndSendResponse(data);
+  }
+
+  @Delete('/:id')
+  @RequiredPermission(Permission.DELETE_TASK)
+  @ApiOperation({ summary: 'Delete task' })
+  @ApiOkResponse({ description: 'Task deleted successfully' })
+  @ApiForbiddenResponse({ description: 'Insufficient permission' })
+  @ApiNotFoundResponse({ description: 'Task not found' })
+  async delete(@Param('id') id: string, @Request() req: FastifyRequest) {
+    const data = await this.taskService.delete({
+      id,
+      organizationId: req.user?.organizationId as string,
+    });
+    return convertAndSendResponse(data);
+  }
+
   @Get('')
-  // @RequiredPermission(Permission.VIEW_TASK)
+  @RequiredPermission(Permission.VIEW_TASK)
   @ApiOperation({ summary: 'Fetch all organization tasks' })
   @ApiQuery({
     name: 'page',

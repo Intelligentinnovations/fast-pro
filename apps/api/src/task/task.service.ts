@@ -2,7 +2,11 @@ import { IServiceHelper } from '@backend-template/types';
 import { Injectable } from '@nestjs/common';
 
 import { TaskRepo } from '../repository';
-import { CreateTaskPayload, PaginationParams } from '../utils';
+import {
+  CreateTaskPayload,
+  PaginationParams,
+  UpdateTaskPayload,
+} from '../utils';
 
 @Injectable()
 export class TaskService {
@@ -21,23 +25,17 @@ export class TaskService {
     };
   }
 
-  // async delete(payload: {
-  //   organizationId: string;
-  //   id: string;
-  // }): Promise<IServiceHelper> {
-  //   const invite = await this.taskRepo.fetchOrganizationInvite(payload);
-  //   if (invite?.status === 'USED')
-  //     return {
-  //       status: 'forbidden',
-  //       message: 'The invite has already been used by a user',
-  //     };
-  //   await this.taskRepo.deleteInvite(payload);
-  //   return {
-  //     status: 'deleted',
-  //     message: 'Invite deleted successfully',
-  //   };
-  // }
-  //
+  async delete(payload: {
+    organizationId: string;
+    id: string;
+  }): Promise<IServiceHelper> {
+    await this.taskRepo.deleteTask(payload);
+    return {
+      status: 'deleted',
+      message: 'Task deleted successfully',
+    };
+  }
+
   async fetchTasks({
     organizationId,
     paginationData,
@@ -55,19 +53,22 @@ export class TaskService {
       data: tasks,
     };
   }
-  //
-  // async updateInvite(
-  //   payload: UpdateInvitePayload & { inviteId: string; organizationId: string }
-  // ): Promise<IServiceHelper> {
-  //   const { inviteId, organizationId, ...data } = payload;
-  //   await this.taskRepo.updateInviteById({
-  //     id: inviteId,
-  //     organizationId,
-  //     payload: data,
-  //   });
-  //   return {
-  //     status: 'successful',
-  //     message: 'Invite updated successfully',
-  //   };
-  // }
+
+  async updateTask(
+    payload: UpdateTaskPayload & { taskId: string; organizationId: string }
+  ): Promise<IServiceHelper> {
+    const { taskId, organizationId, ...data } = payload;
+    const task = await this.taskRepo.fetchTaskById(taskId);
+    if (!task) return { status: 'not-found', message: 'No task found' };
+    if (task.status !== 'todo')
+      return {
+        status: 'forbidden',
+        message: 'Task already in progress or completed',
+      };
+    await this.taskRepo.updateTaskById(payload);
+    return {
+      status: 'successful',
+      message: 'Invite updated successfully',
+    };
+  }
 }

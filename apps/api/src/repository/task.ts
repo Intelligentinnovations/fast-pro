@@ -2,7 +2,13 @@ import { KyselyService } from '@backend-template/database';
 import { Injectable } from '@nestjs/common';
 import { sql } from 'kysely';
 
-import { CreateTaskPayload, DB, paginate, PaginationParams } from '../utils';
+import {
+  CreateTaskPayload,
+  DB,
+  paginate,
+  PaginationParams,
+  UpdateTaskPayload,
+} from '../utils';
 
 @Injectable()
 export class TaskRepo {
@@ -43,5 +49,33 @@ export class TaskRepo {
       ]);
 
     return paginate({ queryBuilder, pagination, identifier: 'Task.id' });
+  }
+
+  async deleteTask(payload: { organizationId: string; id: string }) {
+    return await this.client
+      .deleteFrom('Task')
+      .where('id', '=', payload.id)
+      .where('id', '=', payload.organizationId)
+      .where('status', '=', 'todo')
+      .executeTakeFirst();
+  }
+
+  async updateTaskById(
+    payload: UpdateTaskPayload & { taskId: string; organizationId: string }
+  ) {
+    return await this.client
+      .updateTable('Task')
+      .set(payload)
+      .where('id', '=', payload.taskId)
+      .where('organizationId', '=', payload.organizationId)
+      .executeTakeFirst();
+  }
+
+  async fetchTaskById(taskId: string) {
+    return await this.client
+      .selectFrom('Task')
+      .where('id', '=', taskId)
+      .selectAll()
+      .executeTakeFirst();
   }
 }
