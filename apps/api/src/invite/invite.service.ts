@@ -1,12 +1,12 @@
 import { IServiceHelper } from '@backend-template/types';
 import { Injectable } from '@nestjs/common';
 
-import { InviteRepo } from '../repository/invite';
+import { InviteRepo } from '../repository';
 import {
   CreateInvitePayload,
+  PaginationParams,
   UpdateInvitePayload,
-} from '../utils/schema/staff';
-import { PaginationParams } from '../utils/types/paginationParams';
+} from '../utils';
 
 @Injectable()
 export class InviteService {

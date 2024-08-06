@@ -3,11 +3,9 @@ import { Injectable } from '@nestjs/common';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 
-import { InviteRepo } from '../repository/invite';
-import { UserRepo } from '../repository/user';
+import { InviteRepo, UserRepo } from '../repository';
 import { SecretsService } from '../secrets/secrets.service';
-import { PaginationParams } from '../utils';
-import { CreateStaffAccountPayload } from '../utils/schema/user';
+import { CreateStaffAccountPayload, PaginationParams } from '../utils';
 
 @Injectable()
 export class StaffService {
@@ -93,7 +91,6 @@ export class StaffService {
     organizationId: string;
     id: string;
   }): Promise<IServiceHelper> {
-    const user = await this.userRepo.getUserById(id);
     await this.userRepo.deleteUser({ organizationId, userId: id });
     return {
       status: 'deleted',

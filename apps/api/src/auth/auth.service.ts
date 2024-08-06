@@ -8,13 +8,13 @@ import { generateRandomNumber } from 'libs/helpers/src/lib/randomNumber';
 
 import { UserRepo } from '../repository';
 import { SecretsService } from '../secrets/secrets.service';
-import { UserStatus } from '../utils';
 import {
   EmailPayload,
   LoginPayload,
   ResetPasswordPayload,
+  UserStatus,
   VerifyOtpPayload,
-} from '../utils/schema/auth';
+} from '../utils';
 
 @Injectable()
 export class AuthService {

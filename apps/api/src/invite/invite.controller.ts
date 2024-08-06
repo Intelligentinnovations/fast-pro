@@ -27,16 +27,19 @@ import {
 } from '@nestjs/swagger';
 import { FastifyRequest } from 'fastify';
 
-import { AuthGuard } from '../libraries/guards/auth.guards';
-import { PermissionsGuard } from '../libraries/guards/permissions-guard.service';
-import { RequiredPermission } from '../libraries/guards/role.decorator';
-import { PaginationParams, Permission } from '../utils';
+import {
+  AuthGuard,
+  PermissionsGuard,
+  RequiredPermission,
+} from '../libraries/guards';
 import {
   CreateInvitePayload,
   CreateInviteSchema,
+  PaginationParams,
+  Permission,
   UpdateInvitePayload,
   UpdateInviteSchema,
-} from '../utils/schema/staff';
+} from '../utils';
 import { InviteService } from './invite.service';
 
 @ApiTags('Invites')
