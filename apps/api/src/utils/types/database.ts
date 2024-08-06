@@ -5,36 +5,42 @@ export type Generated<T> = T extends ColumnType<infer S, infer I, infer U>
 export type Timestamp = ColumnType<Date, Date | string, Date | string>;
 
 export const UserStatus = {
-  UNVERIFIED: 'UNVERIFIED',
-  ACTIVE: 'ACTIVE',
-  DEACTIVATED: 'DEACTIVATED',
-  DELETED: 'DELETED',
+  unverified: 'unverified',
+  active: 'active',
+  deactivated: 'deactivated',
+  deleted: 'deleted',
 } as const;
 export type UserStatus = (typeof UserStatus)[keyof typeof UserStatus];
 export const VendorStatus = {
-  INACTIVE: 'INACTIVE',
-  ACTIVE: 'ACTIVE',
-  DEACTIVATED: 'DEACTIVATED',
+  inactive: 'inactive',
+  active: 'active',
+  deactivated: 'deactivated',
 } as const;
 export type VendorStatus = (typeof VendorStatus)[keyof typeof VendorStatus];
 export const InviteStatus = {
-  PENDING: 'PENDING',
-  USED: 'USED',
+  pending: 'pending',
+  used: 'used',
 } as const;
 export type InviteStatus = (typeof InviteStatus)[keyof typeof InviteStatus];
 export const ProposalStatus = {
-  OPEN: 'OPEN',
-  CLOSED: 'CLOSED',
+  open: 'open',
+  closed: 'closed',
 } as const;
 export type ProposalStatus =
   (typeof ProposalStatus)[keyof typeof ProposalStatus];
 export const ProposalRequestStatus = {
-  SUBMITTED: 'SUBMITTED',
-  ACCEPTED: 'ACCEPTED',
-  REJECTED: 'REJECTED',
+  submitted: 'submitted',
+  accepted: 'accepted',
+  rejected: 'rejected',
 } as const;
 export type ProposalRequestStatus =
   (typeof ProposalRequestStatus)[keyof typeof ProposalRequestStatus];
+export const TaskStatus = {
+  todo: 'todo',
+  inProgres: 'inProgres',
+  completed: 'completed',
+} as const;
+export type TaskStatus = (typeof TaskStatus)[keyof typeof TaskStatus];
 export type Department = {
   id: Generated<string>;
   organizationId: string;
@@ -119,6 +125,17 @@ export type RolePermission = {
   created_at: Generated<Timestamp>;
   updated_at: Timestamp | null;
 };
+export type Task = {
+  id: Generated<string>;
+  assigneeId: string;
+  assignerId: string;
+  organizationId: string | null;
+  title: string;
+  priority: string;
+  status: Generated<TaskStatus>;
+  created_at: Generated<Timestamp>;
+  updated_at: Timestamp | null;
+};
 export type User = {
   id: Generated<string>;
   email: string;
@@ -170,6 +187,7 @@ export type DB = {
   ProposalRequest: ProposalRequest;
   Role: Role;
   RolePermission: RolePermission;
+  Task: Task;
   User: User;
   UserRole: UserRole;
   Vendor: Vendor;

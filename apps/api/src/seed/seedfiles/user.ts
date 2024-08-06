@@ -37,7 +37,7 @@ const UserSeed = {
       .values({
         id: vendorId,
         name: 'Dangote Groups',
-        status: 'ACTIVE',
+        status: 'active',
       })
       .execute();
 
@@ -51,7 +51,7 @@ const UserSeed = {
           organizationId: '1ab2610e-b332-46f3-b43e-f740912142e1',
           email: 'admin@admin.com',
           password: bcrypt.hashSync('password', 10),
-          status: UserStatus.ACTIVE,
+          status: UserStatus.active,
         },
         {
           id: '8a93a86b-6f2b-4b17-b6d6-bdc5ca041a03',
@@ -60,7 +60,7 @@ const UserSeed = {
           organizationId: '1ab2610e-b332-46f3-b43e-f740912142e1',
           email: 'james@gordon.com',
           password: bcrypt.hashSync('password', 10),
-          status: UserStatus.ACTIVE,
+          status: UserStatus.active,
         },
         {
           id: vendorUserId,
@@ -69,7 +69,7 @@ const UserSeed = {
           vendorId: vendorId,
           email: 'ira@gaines.com',
           password: bcrypt.hashSync('password', 10),
-          status: UserStatus.ACTIVE,
+          status: UserStatus.active,
         },
       ])
       .execute();

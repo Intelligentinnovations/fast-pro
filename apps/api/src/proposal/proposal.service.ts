@@ -2,6 +2,7 @@ import { IServiceHelper } from '@backend-template/types';
 import { Injectable } from '@nestjs/common';
 
 import { ProposalRepo } from '../repository/proposal';
+import { ProposalRequestRepo } from '../repository/proposalRequest';
 import {
   CreateProposalPayload,
   PaginationParams,
@@ -10,7 +11,10 @@ import {
 
 @Injectable()
 export class ProposalService {
-  constructor(private proposalRepo: ProposalRepo) {}
+  constructor(
+    private proposalRepo: ProposalRepo,
+    private proposalRequestRepo: ProposalRequestRepo
+  ) {}
   async createProposal(
     payload: CreateProposalPayload & { organizationId: string }
   ): Promise<IServiceHelper> {
@@ -66,6 +70,17 @@ export class ProposalService {
     id: string;
     organizationId: string;
   }): Promise<IServiceHelper> {
+    const hasRequests =
+      await this.proposalRequestRepo.fetchOrganizationProposalRequest({
+        proposalId: id,
+        organizationId,
+        pagination: { limit: 1, page: 1 },
+      });
+    if (hasRequests.totalItems > 0)
+      return {
+        status: 'forbidden',
+        message: 'A proposal with request can not be deleted',
+      };
     await this.proposalRepo.deleteProposal({
       id,
       organizationId,

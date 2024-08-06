@@ -32,6 +32,11 @@ const CREATE_PROPOSAL_REQUEST_PERMISSION_ID = randomUUID();
 const UPDATE_PROPOSAL_REQUEST_PERMISSION_ID = randomUUID();
 const VIEW_PROPOSAL_REQUEST_PERMISSION_ID = randomUUID();
 
+const CREATE_TASK_PERMISSION_ID = randomUUID();
+const VIEW_TASK_PERMISSION_ID = randomUUID();
+const UPDATE_TASK_PERMISSION_ID = randomUUID();
+const DELETE_TASK_PERMISSION_ID = randomUUID();
+
 const RolesSeed = {
   run: async () => {
     await dbClient
@@ -162,6 +167,26 @@ const RolesSeed = {
           name: 'VIEW_PROPOSAL_REQUEST',
           description: 'Can view proposal request',
         },
+        {
+          id: CREATE_TASK_PERMISSION_ID,
+          name: 'CREATE_TASK',
+          description: 'Can create task',
+        },
+        {
+          id: VIEW_TASK_PERMISSION_ID,
+          name: 'VIEW_TASK',
+          description: 'Can view task',
+        },
+        {
+          id: UPDATE_TASK_PERMISSION_ID,
+          name: 'UPDATE_TASK',
+          description: 'Can update task',
+        },
+        {
+          id: DELETE_TASK_PERMISSION_ID,
+          name: 'DELETE_TASK',
+          description: 'Can deleted task',
+        },
       ])
       .execute();
 
@@ -181,7 +206,6 @@ const RolesSeed = {
           roleId: ADMIN_ROLE_ID,
           permissionId: DELETE_INVITE_PERMISSION_ID,
         },
-
         {
           roleId: ADMIN_ROLE_ID,
           permissionId: VIEW_STAFF_PERMISSION_ID,
@@ -221,6 +245,22 @@ const RolesSeed = {
         {
           roleId: ADMIN_ROLE_ID,
           permissionId: VIEW_PROPOSAL_REQUEST_PERMISSION_ID,
+        },
+        {
+          roleId: ADMIN_ROLE_ID,
+          permissionId: CREATE_TASK_PERMISSION_ID,
+        },
+        {
+          roleId: ADMIN_ROLE_ID,
+          permissionId: VIEW_TASK_PERMISSION_ID,
+        },
+        {
+          roleId: ADMIN_ROLE_ID,
+          permissionId: UPDATE_TASK_PERMISSION_ID,
+        },
+        {
+          roleId: ADMIN_ROLE_ID,
+          permissionId: DELETE_TASK_PERMISSION_ID,
         },
 
         // requester role

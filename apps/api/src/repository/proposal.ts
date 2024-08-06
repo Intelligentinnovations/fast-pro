@@ -83,7 +83,7 @@ export class ProposalRepo {
         'dateRequired',
         'Organization.name as organizationName',
       ])
-      .where('status', '=', 'OPEN');
+      .where('status', '=', 'open');
     return paginate<Proposal>({
       queryBuilder,
       pagination,

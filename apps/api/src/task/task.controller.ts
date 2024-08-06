@@ -33,72 +33,75 @@ import {
   RequiredPermission,
 } from '../libraries/guards';
 import {
-  CreateInvitePayload,
-  CreateInviteSchema,
+  CreateTaskPayload,
+  CreateTaskSchema,
   PaginationParams,
   Permission,
-  UpdateInvitePayload,
-  UpdateInviteSchema,
+  UpdateTaskPayload,
+  UpdateTaskSchema,
 } from '../utils';
-import { InviteService } from './invite.service';
+import { TaskService } from './task.service';
 
-@ApiTags('Invites')
+@ApiTags('Tasks')
 @ApiBearerAuth()
 @UseGuards(AuthGuard, PermissionsGuard)
-@Controller('invites')
-export class InviteController {
-  constructor(private readonly staffService: InviteService) {}
+@Controller('tasks')
+export class TaskController {
+  constructor(private readonly taskService: TaskService) {}
 
   @Post('')
-  @RequiredPermission(Permission.CREATE_INVITE)
-  @ApiOperation({ summary: 'Invite staff member' })
+  @RequiredPermission(Permission.CREATE_TASK)
+  @ApiOperation({ summary: 'Assign task to a staff member' })
   @ApiBody({
-    description: 'Invite staff to join fast organization',
-    schema: zodToApi(CreateInviteSchema),
+    description: 'Create and assign task payload',
+    schema: zodToApi(CreateTaskSchema),
   })
-  @ApiCreatedResponse({ description: `We have sent an invite to staff email` })
-  @ApiConflictResponse({ description: 'A staff with the email exist' })
-  @UsePipes(new ZodValidationPipe(CreateInviteSchema))
-  async invite(
-    @Body() payload: CreateInvitePayload,
+  @ApiCreatedResponse({ description: `Task created successfully` })
+  @ApiConflictResponse({
+    description: 'A pending task with the same name exist',
+  })
+  @UsePipes(new ZodValidationPipe(CreateTaskSchema))
+  async assignTask(
+    @Body() payload: CreateTaskPayload,
     @Request() req: FastifyRequest
   ) {
-    const data = await this.staffService.invite({
+    const data = await this.taskService.assignTask({
       ...payload,
+      userId: req.user?.userId as string,
       organizationId: req.user?.organizationId as string,
     });
     return convertAndSendResponse(data);
   }
-  @Put('/:id')
-  @RequiredPermission(Permission.UPDATE_INVITE)
-  @ApiOperation({ summary: 'Update staff invite' })
+
+  @Put(':id')
+  @RequiredPermission(Permission.UPDATE_TASK)
+  @ApiOperation({ summary: 'Update pending task' })
   @ApiBody({
-    description: 'Update invite payload',
-    schema: zodToApi(UpdateInviteSchema),
+    description: 'Update task payload',
+    schema: zodToApi(UpdateTaskSchema),
   })
-  @ApiOkResponse({ description: 'Invite updated successfully' })
-  async updateInvite(
-    @Body(new ZodValidationPipe(UpdateInviteSchema))
-    payload: UpdateInvitePayload,
-    @Param('id') inviteId: string,
-    @Request() req: FastifyRequest
+  @ApiOkResponse({ description: 'Task updated successfully' })
+  async updateTask(
+    @Param('id') taskId: string,
+    @Request() req: FastifyRequest,
+    @Body(new ZodValidationPipe(UpdateTaskSchema)) payload: UpdateTaskPayload
   ) {
-    const data = await this.staffService.updateInvite({
+    const data = await this.taskService.updateTask({
       ...payload,
-      inviteId,
+      taskId,
       organizationId: req.user?.organizationId as string,
     });
     return convertAndSendResponse(data);
   }
 
   @Delete('/:id')
-  @RequiredPermission(Permission.DELETE_INVITE)
-  @ApiOperation({ summary: 'Delete invite' })
-  @ApiOkResponse({ description: 'Invite deleted successfully' })
+  @RequiredPermission(Permission.DELETE_TASK)
+  @ApiOperation({ summary: 'Delete task' })
+  @ApiOkResponse({ description: 'Task deleted successfully' })
   @ApiForbiddenResponse({ description: 'Insufficient permission' })
-  @ApiNotFoundResponse({ description: 'Invite not found' })
+  @ApiNotFoundResponse({ description: 'Task not found' })
   async delete(@Param('id') id: string, @Request() req: FastifyRequest) {
-    const data = await this.staffService.delete({
+    const data = await this.taskService.delete({
       id,
       organizationId: req.user?.organizationId as string,
     });
@@ -106,8 +109,8 @@ export class InviteController {
   }
 
   @Get('')
-  @RequiredPermission(Permission.VIEW_INVITE)
-  @ApiOperation({ summary: 'Fetch all organization invites' })
+  @RequiredPermission(Permission.VIEW_TASK)
+  @ApiOperation({ summary: 'Fetch all organization tasks' })
   @ApiQuery({
     name: 'page',
     required: false,
@@ -120,13 +123,13 @@ export class InviteController {
     type: Number,
     description: 'Number of items per page',
   })
-  @ApiOkResponse({ description: 'Invites fetched successfully' })
+  @ApiOkResponse({ description: 'Tasks fetched successfully' })
   @ApiForbiddenResponse({ description: 'Insufficient permission' })
-  async getStaff(
+  async getTask(
     @Request() req: FastifyRequest,
     @Query() paginationData: PaginationParams
   ) {
-    const data = await this.staffService.fetchInvites({
+    const data = await this.taskService.fetchTasks({
       organizationId: req.user?.organizationId as string,
       paginationData,
     });

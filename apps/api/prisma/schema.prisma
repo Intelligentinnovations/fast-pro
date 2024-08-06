@@ -10,27 +10,29 @@ datasource db {
 }
 
 model User {
-  id             String        @id @default(dbgenerated("gen_random_uuid()"))
-  email          String        @unique
-  firstname      String
-  lastname       String
-  password       String
-  status         UserStatus    @default(UNVERIFIED)
-  organizationId String?
-  Organization   Organization? @relation(fields: [organizationId], references: [id])
-  vendorId       String?
-  Vendor         Vendor?       @relation(fields: [vendorId], references: [id])
-  departmentId   String?
-  department     Department?   @relation(fields: [departmentId], references: [id])
-  isDeleted      Boolean       @default(false)
-  profileImage   String?
-  title          String?
-  biography      String?
-  phoneNumber    String?
-  address        String?
-  UserRole       UserRole[]
-  createdAt      DateTime      @default(now()) @map("created_at")
-  updatedAt      DateTime?     @updatedAt @map("updated_at")
+  id              String        @id @default(dbgenerated("gen_random_uuid()"))
+  email           String        @unique
+  firstname       String
+  lastname        String
+  password        String
+  status          UserStatus    @default(unverified)
+  organizationId  String?
+  Organization    Organization? @relation(fields: [organizationId], references: [id])
+  vendorId        String?
+  Vendor          Vendor?       @relation(fields: [vendorId], references: [id])
+  departmentId    String?
+  department      Department?   @relation(fields: [departmentId], references: [id])
+  isDeleted       Boolean       @default(false)
+  profileImage    String?
+  title           String?
+  biography       String?
+  phoneNumber     String?
+  address         String?
+  UserRole        UserRole[]
+  createdAt       DateTime      @default(now()) @map("created_at")
+  updatedAt       DateTime?     @updatedAt @map("updated_at")
+  assignedTasks   Task[]        @relation("AssignedTasks")
+  assignedTasksBy Task[]        @relation("AssignedTasksBy")
 }
 
 model Organization {
@@ -51,6 +53,7 @@ model Organization {
   Invite      Invite[]
   Departments Department[]
   Proposal    Proposal[]
+  Task        Task[]
 }
 
 model Department {
@@ -75,7 +78,7 @@ model Vendor {
   email                      String?
   phoneNumber                String?
   address                    String?
-  status                     VendorStatus      @default(INACTIVE)
+  status                     VendorStatus      @default(inactive)
   createdAt                  DateTime          @default(now()) @map("created_at")
   updatedAt                  DateTime?         @updatedAt @map("updated_at")
   User                       User[]
@@ -107,7 +110,7 @@ model Invite {
   email          String
   roleId         String
   departmentId   String
-  status         InviteStatus @default(PENDING)
+  status         InviteStatus @default(pending)
   createdAt      DateTime     @default(now()) @map("created_at")
   updatedAt      DateTime?    @updatedAt @map("updated_at")
 }
@@ -126,7 +129,7 @@ model Proposal {
   additionalDocument  String?
   evaluationCriteria  String[]
   eligibilityCriteria String[]
-  status              ProposalStatus    @default(OPEN)
+  status              ProposalStatus    @default(open)
   createdAt           DateTime          @default(now()) @map("created_at")
   updatedAt           DateTime?         @updatedAt @map("updated_at")
   ProposalRequest     ProposalRequest[]
@@ -149,9 +152,24 @@ model ProposalRequest {
   title       String
   summary     String
   attachments String[]
-  status      ProposalRequestStatus @default(SUBMITTED)
+  status      ProposalRequestStatus @default(submitted)
   createdAt   DateTime              @default(now()) @map("created_at")
   updatedAt   DateTime?             @updatedAt @map("updated_at")
+}
+
+model Task {
+  id             String        @id @default(dbgenerated("gen_random_uuid()"))
+  assigneeId     String
+  Assignee       User          @relation("AssignedTasks", fields: [assigneeId], references: [id])
+  assignerId     String
+  Assigner       User          @relation("AssignedTasksBy", fields: [assignerId], references: [id])
+  organizationId String?
+  Organization   Organization? @relation(fields: [organizationId], references: [id])
+  title          String
+  priority       String
+  status         TaskStatus    @default(todo)
+  createdAt      DateTime      @default(now()) @map("created_at")
+  updatedAt      DateTime?     @updatedAt @map("updated_at")
 }
 
 model UserRole {
@@ -177,30 +195,36 @@ model RolePermission {
 }
 
 enum UserStatus {
-  UNVERIFIED
-  ACTIVE
-  DEACTIVATED
-  DELETED
+  unverified
+  active
+  deactivated
+  deleted
 }
 
 enum VendorStatus {
-  INACTIVE
-  ACTIVE
-  DEACTIVATED
+  inactive
+  active
+  deactivated
 }
 
 enum InviteStatus {
-  PENDING
-  USED
+  pending
+  used
 }
 
 enum ProposalStatus {
-  OPEN
-  CLOSED
+  open
+  closed
 }
 
 enum ProposalRequestStatus {
-  SUBMITTED
-  ACCEPTED
-  REJECTED
+  submitted
+  accepted
+  rejected
+}
+
+enum TaskStatus {
+  todo
+  inProgres
+  completed
 }
