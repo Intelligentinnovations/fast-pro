@@ -151,19 +151,4 @@ export class ProposalRequestController {
       });
     return convertAndSendResponse(data);
   }
-
-  // @Delete(':id')
-  // @RequiredPermission(Permission.DELETE_PROPOSAL_REQUEST)
-  // @ApiOperation({ summary: 'Delete proposal' })
-  // @ApiOkResponse({ description: 'Proposal deleted successfully' })
-  // async deleteProposal(
-  //   @Request() req: FastifyRequest,
-  //   @Param('id') proposalId: string
-  // ) {
-  //   const data = await this.proposalRequestService.deleteProposal({
-  //     organizationId: req.user?.organizationId as string,
-  //     id: proposalId,
-  //   });
-  //   return convertAndSendResponse(data);
-  // }
 }

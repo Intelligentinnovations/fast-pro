@@ -77,9 +77,9 @@ export class InviteController {
     schema: zodToApi(UpdateInviteSchema),
   })
   @ApiOkResponse({ description: 'Invite updated successfully' })
-  @UsePipes(new ZodValidationPipe(UpdateInviteSchema))
   async updateInvite(
-    @Body() payload: UpdateInvitePayload,
+    @Body(new ZodValidationPipe(UpdateInviteSchema))
+    payload: UpdateInvitePayload,
     @Param('id') inviteId: string,
     @Request() req: FastifyRequest
   ) {

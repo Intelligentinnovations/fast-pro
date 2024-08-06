@@ -73,7 +73,7 @@ export class TaskController {
     return convertAndSendResponse(data);
   }
 
-  @Put('/:id')
+  @Put(':id')
   @RequiredPermission(Permission.UPDATE_TASK)
   @ApiOperation({ summary: 'Update pending task' })
   @ApiBody({
@@ -81,11 +81,10 @@ export class TaskController {
     schema: zodToApi(UpdateTaskSchema),
   })
   @ApiOkResponse({ description: 'Task updated successfully' })
-  @UsePipes(new ZodValidationPipe(UpdateTaskSchema))
   async updateTask(
-    @Body() payload: UpdateTaskPayload,
     @Param('id') taskId: string,
-    @Request() req: FastifyRequest
+    @Request() req: FastifyRequest,
+    @Body(new ZodValidationPipe(UpdateTaskSchema)) payload: UpdateTaskPayload
   ) {
     const data = await this.taskService.updateTask({
       ...payload,
@@ -126,7 +125,7 @@ export class TaskController {
   })
   @ApiOkResponse({ description: 'Tasks fetched successfully' })
   @ApiForbiddenResponse({ description: 'Insufficient permission' })
-  async getStaff(
+  async getTask(
     @Request() req: FastifyRequest,
     @Query() paginationData: PaginationParams
   ) {

@@ -74,9 +74,9 @@ export class ProposalController {
     schema: zodToApi(UpdateProposalSchema),
   })
   @ApiCreatedResponse({ description: 'Proposal updated successfully' })
-  @UsePipes(new ZodValidationPipe(UpdateProposalSchema))
   async updateProposal(
-    @Body() payload: UpdateProposalPayload,
+    @Body(new ZodValidationPipe(UpdateProposalSchema))
+    payload: UpdateProposalPayload,
     @Request() req: FastifyRequest,
     @Param('id') id: string
   ) {

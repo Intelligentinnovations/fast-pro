@@ -63,11 +63,12 @@ export class TaskRepo {
   async updateTaskById(
     payload: UpdateTaskPayload & { taskId: string; organizationId: string }
   ) {
+    const { taskId, organizationId, ...updateData } = payload;
     return await this.client
       .updateTable('Task')
-      .set(payload)
-      .where('id', '=', payload.taskId)
-      .where('organizationId', '=', payload.organizationId)
+      .set(updateData)
+      .where('id', '=', taskId)
+      .where('organizationId', '=', organizationId)
       .executeTakeFirst();
   }
 
