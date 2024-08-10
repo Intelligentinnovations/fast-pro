@@ -36,6 +36,7 @@ const CREATE_TASK_PERMISSION_ID = randomUUID();
 const VIEW_TASK_PERMISSION_ID = randomUUID();
 const UPDATE_TASK_PERMISSION_ID = randomUUID();
 const DELETE_TASK_PERMISSION_ID = randomUUID();
+const DELETE_ACCOUNT_PERMISSION_ID = randomUUID();
 
 const RolesSeed = {
   run: async () => {
@@ -68,7 +69,6 @@ const RolesSeed = {
     await dbClient
       .insertInto('Permission')
       .values([
-        // admin permissions
         {
           id: CREATE_INVITE_PERMISSION_ID,
           name: 'CREATE_INVITE',
@@ -187,6 +187,11 @@ const RolesSeed = {
           name: 'DELETE_TASK',
           description: 'Can deleted task',
         },
+        {
+          id: DELETE_ACCOUNT_PERMISSION_ID,
+          name: 'DELETE_ACCOUNT',
+          description: 'Can deleted organization account',
+        },
       ])
       .execute();
 
@@ -261,6 +266,10 @@ const RolesSeed = {
         {
           roleId: ADMIN_ROLE_ID,
           permissionId: DELETE_TASK_PERMISSION_ID,
+        },
+        {
+          roleId: ADMIN_ROLE_ID,
+          permissionId: DELETE_ACCOUNT_PERMISSION_ID,
         },
 
         // requester role

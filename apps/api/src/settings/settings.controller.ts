@@ -3,12 +3,14 @@ import { ZodValidationPipe } from '@backend-template/http';
 import {
   Body,
   Controller,
+  Delete,
   Post,
   Request,
   UseGuards,
   UsePipes,
 } from '@nestjs/common';
 import {
+  ApiBearerAuth,
   ApiBody,
   ApiForbiddenResponse,
   ApiOkResponse,
@@ -17,12 +19,22 @@ import {
 } from '@nestjs/swagger';
 import { FastifyRequest } from 'fastify';
 
-import { AuthGuard } from '../libraries/guards';
-import { ChangePasswordPayload, ChangePasswordSchema } from '../utils';
+import {
+  AuthGuard,
+  PermissionsGuard,
+  RequiredPermission,
+} from '../libraries/guards';
+import {
+  ChangePasswordPayload,
+  ChangePasswordSchema,
+  DeleteAccountPayload,
+  Permission,
+} from '../utils';
 import { SettingsService } from './settings.service';
 
-@UseGuards(AuthGuard)
+@ApiBearerAuth()
 @ApiTags('Settings')
+@UseGuards(AuthGuard)
 @Controller('settings')
 export class SettingsController {
   constructor(private readonly settingsService: SettingsService) {}
@@ -47,48 +59,19 @@ export class SettingsController {
     return convertAndSendResponse(data);
   }
 
-  //   @Get('')
-  //   @ApiBearerAuth()
-  //   @RequiredPermission(Permission.VIEW_STAFF)
-  //   @ApiOperation({ summary: 'Fetch all staff' })
-  //   @ApiQuery({
-  //     name: 'page',
-  //     required: false,
-  //     type: Number,
-  //     description: 'Page number',
-  //   })
-  //   @ApiQuery({
-  //     name: 'limit',
-  //     required: false,
-  //     type: Number,
-  //     description: 'Number of items per page',
-  //   })
-  //   @ApiOkResponse({ description: 'Staff fetched successfully' })
-  //   @ApiForbiddenResponse({ description: 'Insufficient permission' })
-  //   async getStaff(
-  //     @Request() req: FastifyRequest,
-  //     @Query() paginationData: PaginationParams
-  //   ) {
-  //     const data = await this.settingsService.fetchStaff({
-  //       organizationId: req.user?.organizationId as string,
-  //       paginationData,
-  //       currentUserId: req.user?.userId as string,
-  //     });
-  //     return convertAndSendResponse(data);
-  //   }
-  //
-  //   @Delete(':id')
-  //   @ApiBearerAuth()
-  //   @UseGuards(AuthGuard, PermissionsGuard)
-  //   @RequiredPermission(Permission.DELETE_STAFF)
-  //   @ApiOperation({ summary: 'Delete a staff' })
-  //   @ApiOkResponse({ description: 'staff deleted successfully' })
-  //   @ApiForbiddenResponse({ description: 'Insufficient permission' })
-  //   async delete(@Param('id') id: string, @Request() req: FastifyRequest) {
-  //     const data = await this.settingsService.delete({
-  //       id,
-  //       organizationId: req.user?.organizationId as string,
-  //     });
-  //     return convertAndSendResponse(data);
-  //   }
+  @Delete('delete-account')
+  @UseGuards(PermissionsGuard)
+  @RequiredPermission(Permission.DELETE_ACCOUNT)
+  @ApiOperation({ summary: 'Delete organization account staff' })
+  @ApiOkResponse({ description: 'account deleted successfully' })
+  @ApiForbiddenResponse({ description: 'Insufficient permission' })
+  async deleteOrganizationAccount(
+    @Request() req: FastifyRequest,
+    @Body() payload: DeleteAccountPayload
+  ) {
+    const data = await this.settingsService.deleteOrganizationAccount(
+      req.user?.organizationId as string
+    );
+    return convertAndSendResponse(data);
+  }
 }

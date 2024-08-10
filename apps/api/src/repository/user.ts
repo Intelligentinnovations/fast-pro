@@ -274,4 +274,20 @@ export class UserRepo {
       };
     });
   }
+
+  async deleteOrganization(organizationId: string) {
+    return this.client.transaction().execute(async (trx) => {
+      await trx
+        .updateTable('Organization')
+        .set({ isDeleted: true })
+        .where('id', '=', organizationId)
+        .execute();
+
+      await trx
+        .updateTable('User')
+        .set({ isDeleted: true })
+        .where('organizationId', '=', organizationId)
+        .execute();
+    });
+  }
 }

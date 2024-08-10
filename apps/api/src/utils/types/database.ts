@@ -70,6 +70,7 @@ export type Organization = {
   email: string | null;
   phoneNumber: string | null;
   address: string | null;
+  isDeleted: Generated<boolean>;
   created_at: Generated<Timestamp>;
   updated_at: Timestamp | null;
 };

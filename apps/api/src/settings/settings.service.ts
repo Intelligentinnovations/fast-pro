@@ -47,4 +47,14 @@ export class SettingsService {
       message: 'Staff deleted successfully',
     };
   }
+
+  async deleteOrganizationAccount(
+    organizationId: string
+  ): Promise<IServiceHelper> {
+    await this.userRepo.deleteOrganization(organizationId);
+    return {
+      status: 'successful',
+      message: 'account deleted successfully',
+    };
+  }
 }
