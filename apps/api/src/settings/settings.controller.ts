@@ -69,9 +69,11 @@ export class SettingsController {
     @Request() req: FastifyRequest,
     @Body() payload: DeleteAccountPayload
   ) {
-    const data = await this.settingsService.deleteOrganizationAccount(
-      req.user?.organizationId as string
-    );
+    const data = await this.settingsService.deleteOrganizationAccount({
+      organizationId: req.user?.organizationId as string,
+      password: payload.password,
+      email: req.user?.email as string,
+    });
     return convertAndSendResponse(data);
   }
 }

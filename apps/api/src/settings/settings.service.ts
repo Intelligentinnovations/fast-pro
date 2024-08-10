@@ -48,9 +48,22 @@ export class SettingsService {
     };
   }
 
-  async deleteOrganizationAccount(
-    organizationId: string
-  ): Promise<IServiceHelper> {
+  async deleteOrganizationAccount({
+    organizationId,
+    password,
+    email,
+  }: {
+    organizationId: string;
+    password: string;
+    email: string;
+  }): Promise<IServiceHelper> {
+    const user = await this.userRepo.getUserByEmail(email);
+    const match = bcrypt.compare(password, user?.password as string);
+    if (!match)
+      return {
+        status: 'forbidden',
+        message: 'Incorrect password',
+      };
     await this.userRepo.deleteOrganization(organizationId);
     return {
       status: 'successful',
