@@ -24,7 +24,6 @@ import {
   PermissionsGuard,
   RequiredPermission,
 } from '../libraries/guards';
-import { Permission } from '../utils';
 import {
   CompleteAdminRegistrationPayload,
   CompleteAdminRegistrationSchema,
@@ -34,7 +33,8 @@ import {
   CreateAdminAccountSchema,
   CreateVendorPayload,
   CreateVendorSchema,
-} from '../utils/schema/user';
+  Permission,
+} from '../utils';
 import { UserService } from './user.service';
 
 @ApiTags('User')
