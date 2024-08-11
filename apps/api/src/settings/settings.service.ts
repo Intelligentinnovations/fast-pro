@@ -3,12 +3,11 @@ import { Injectable } from '@nestjs/common';
 import bcrypt from 'bcrypt';
 
 import { UserRepo } from '../repository';
-import { SecretsService } from '../secrets/secrets.service';
 import { ChangePasswordPayload } from '../utils';
 
 @Injectable()
 export class SettingsService {
-  constructor(private userRepo: UserRepo, private secrets: SecretsService) {}
+  constructor(private userRepo: UserRepo) {}
 
   async changePassword(
     payload: ChangePasswordPayload & { email: string }
@@ -25,26 +24,12 @@ export class SettingsService {
     const hashedPassword = await bcrypt.hash(newPassword, 10);
     await this.userRepo.updateUserByEmail({
       email: payload.email,
-      password: hashedPassword,
+      payload: { password: hashedPassword },
     });
 
     return {
       status: 'successful',
       message: 'Password updated successfully',
-    };
-  }
-
-  async delete({
-    organizationId,
-    id,
-  }: {
-    organizationId: string;
-    id: string;
-  }): Promise<IServiceHelper> {
-    await this.userRepo.deleteUser({ organizationId, userId: id });
-    return {
-      status: 'deleted',
-      message: 'Staff deleted successfully',
     };
   }
 

@@ -126,8 +126,8 @@ export class AuthService {
 
     if (originalOtpKey === `${payload.email}-signup-verification`) {
       await this.userRepo.updateUserByEmail({
-        status: UserStatus.active,
         email: payload.email,
+        payload: { status: UserStatus.active },
       });
 
       const updatedUser = await this.userRepo.getUserAndPermissions(
@@ -168,7 +168,7 @@ export class AuthService {
       };
     await this.userRepo.updateUserByEmail({
       email,
-      password: await bcrypt.hash(password, 10),
+      payload: { password: await bcrypt.hash(password, 10) },
     });
 
     return {

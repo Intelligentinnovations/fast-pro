@@ -10,7 +10,9 @@ import {
   CompleteVendorRegistrationPayload,
   CreateAdminAccountPayload,
   CreateVendorPayload,
-} from '../utils/schema/user';
+  UpdateUserProfilePayload,
+  UserData,
+} from '../utils';
 
 @Injectable()
 export class UserService {
@@ -95,6 +97,30 @@ export class UserService {
     return {
       status: 'successful',
       message: 'Registration completed successfully',
+    };
+  }
+
+  async fetchUserProfile(userId: string): Promise<IServiceHelper> {
+    const userProfile = await this.userRepo.getUserById(userId);
+    return {
+      status: 'successful',
+      message: 'User profile fetched successfully',
+      data: userProfile,
+    };
+  }
+
+  async updateUser({
+    user,
+    payload,
+  }: {
+    user: UserData;
+    payload: UpdateUserProfilePayload;
+  }): Promise<IServiceHelper> {
+    await this.userRepo.updateUserByEmail({ email: user.email, payload });
+
+    return {
+      status: 'successful',
+      message: 'Profile updated successfully',
     };
   }
 }

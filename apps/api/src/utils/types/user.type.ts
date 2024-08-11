@@ -3,7 +3,6 @@ import { UserStatus } from './database';
 export interface UpdateUserPayload {
   lastname?: string;
   firstname?: string;
-  email: string;
   isDeleted?: boolean;
   status?: UserStatus;
   password?: string;

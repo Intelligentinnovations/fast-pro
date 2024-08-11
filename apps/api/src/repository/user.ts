@@ -3,6 +3,9 @@ import { Injectable } from '@nestjs/common';
 import bcrypt from 'bcrypt';
 
 import {
+  CreateAdminAccountPayload,
+  CreateStaffAccountPayload,
+  CreateVendorPayload,
   DB,
   Invite,
   paginate,
@@ -11,11 +14,6 @@ import {
   UserData,
   UserStatus,
 } from '../utils';
-import {
-  CreateAdminAccountPayload,
-  CreateStaffAccountPayload,
-  CreateVendorPayload,
-} from '../utils/schema/user';
 
 @Injectable()
 export class UserRepo {
@@ -74,25 +72,40 @@ export class UserRepo {
   async getUserByEmail(email: string) {
     return this.client
       .selectFrom('User')
-      .selectAll()
+      .select(['id', 'email', 'firstname', 'lastname', 'password'])
       .where('email', '=', email)
       .executeTakeFirst();
   }
   async getUserById(id: string) {
     return this.client
       .selectFrom('User')
-      .selectAll()
+      .select([
+        'id',
+        'firstname',
+        'lastname',
+        'email',
+        'address',
+        'biography',
+        'phoneNumber',
+        'title',
+      ])
       .where('id', '=', id)
       .executeTakeFirst();
   }
 
-  async updateUserByEmail(payload: UpdateUserPayload) {
+  async updateUserByEmail({
+    email,
+    payload,
+  }: {
+    email: string;
+    payload: UpdateUserPayload;
+  }) {
     return this.client
       .updateTable('User')
       .set({
         ...payload,
       })
-      .where('email', '=', payload.email)
+      .where('email', '=', email)
       .executeTakeFirstOrThrow();
   }
 
