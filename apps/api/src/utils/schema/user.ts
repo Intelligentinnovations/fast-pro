@@ -8,10 +8,6 @@ export const CreateAdminAccountSchema = z.object({
   organizationName: z.string(),
 });
 
-export type CreateAdminAccountPayload = z.infer<
-  typeof CreateAdminAccountSchema
->;
-
 export const CreateStaffAccountSchema = z.object({
   firstname: z.string(),
   lastname: z.string(),
@@ -19,10 +15,6 @@ export const CreateStaffAccountSchema = z.object({
   jobTitle: z.string(),
   inviteId: z.string(),
 });
-
-export type CreateStaffAccountPayload = z.infer<
-  typeof CreateStaffAccountSchema
->;
 
 export const CreateVendorSchema = z.object({
   firstname: z.string(),
@@ -33,18 +25,12 @@ export const CreateVendorSchema = z.object({
   phoneNumber: z.string(),
 });
 
-export type CreateVendorPayload = z.infer<typeof CreateVendorSchema>;
-
 export const CompleteAdminRegistrationSchema = z.object({
   sector: z.string(),
   companySize: z.string(),
   logo: z.string().optional(),
   companyId: z.string().optional(),
 });
-
-export type CompleteAdminRegistrationPayload = z.infer<
-  typeof CompleteAdminRegistrationSchema
->;
 
 export const CompleteVendorRegistrationSchema = z.object({
   businessRegistrationNumber: z.string(),
@@ -55,6 +41,27 @@ export const CompleteVendorRegistrationSchema = z.object({
   logo: z.string().optional(),
 });
 
+export const UpdateUserProfileSchema = z.object({
+  firstName: z.string().optional(),
+  lastName: z.string().optional(),
+  title: z.string().optional(),
+  phoneNumber: z.string().optional(),
+  address: z.string().optional(),
+  biography: z.string().optional(),
+  profileImage: z.string().optional(),
+});
+
 export type CompleteVendorRegistrationPayload = z.infer<
   typeof CompleteVendorRegistrationSchema
+>;
+export type UpdateUserProfilePayload = z.infer<typeof UpdateUserProfileSchema>;
+export type CompleteAdminRegistrationPayload = z.infer<
+  typeof CompleteAdminRegistrationSchema
+>;
+export type CreateVendorPayload = z.infer<typeof CreateVendorSchema>;
+export type CreateStaffAccountPayload = z.infer<
+  typeof CreateStaffAccountSchema
+>;
+export type CreateAdminAccountPayload = z.infer<
+  typeof CreateAdminAccountSchema
 >;

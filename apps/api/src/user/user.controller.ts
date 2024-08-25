@@ -3,7 +3,9 @@ import { ZodValidationPipe } from '@backend-template/http';
 import {
   Body,
   Controller,
+  Get,
   Post,
+  Put,
   Request,
   UseGuards,
   UsePipes,
@@ -24,7 +26,6 @@ import {
   PermissionsGuard,
   RequiredPermission,
 } from '../libraries/guards';
-import { Permission } from '../utils';
 import {
   CompleteAdminRegistrationPayload,
   CompleteAdminRegistrationSchema,
@@ -34,7 +35,12 @@ import {
   CreateAdminAccountSchema,
   CreateVendorPayload,
   CreateVendorSchema,
-} from '../utils/schema/user';
+  Permission,
+  UpdateUserProfilePayload,
+  UpdateUserProfileSchema,
+  User,
+  UserData,
+} from '../utils';
 import { UserService } from './user.service';
 
 @ApiTags('User')
@@ -109,6 +115,39 @@ export class UserController {
     const data = await this.userService.completeVendorRegistration({
       ...payload,
       vendorId: req.user?.vendorId as string,
+    });
+    return convertAndSendResponse(data);
+  }
+
+  @Get('profile')
+  @UseGuards(AuthGuard)
+  @ApiBearerAuth()
+  @ApiOkResponse({ description: `User profile fetched successfully` })
+  @ApiOperation({ summary: 'Fetch user profile' })
+  async getProfile(@Request() req: FastifyRequest) {
+    const data = await this.userService.fetchUserProfile(
+      req.user?.userId as string
+    );
+    return convertAndSendResponse(data);
+  }
+
+  @Put('profile')
+  @UseGuards(AuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Update user profile.' })
+  @ApiBody({
+    description: 'Update profile payload',
+    schema: zodToApi(UpdateUserProfileSchema),
+  })
+  @ApiOkResponse({ description: `Registration completed successfully` })
+  @UsePipes(new ZodValidationPipe(UpdateUserProfileSchema))
+  async updateUserProfile(
+    @Body() payload: UpdateUserProfilePayload,
+    @Request() req: FastifyRequest
+  ) {
+    const data = await this.userService.updateUser({
+      payload: { ...payload },
+      user: req.user as UserData,
     });
     return convertAndSendResponse(data);
   }

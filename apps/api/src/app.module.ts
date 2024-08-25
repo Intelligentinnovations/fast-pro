@@ -12,6 +12,7 @@ import { ProposalRequestModule } from './proposalRequest/proposalRequest.module'
 import { RepositoryModule } from './repository/repository.module';
 import { SecretsModule } from './secrets/secrets.module';
 import { SecretsService } from './secrets/secrets.service';
+import { SettingsModule } from './settings/settings.module';
 import { StaffModule } from './staff/staff.module';
 import { TaskModule } from './task/task.module';
 import { UserModule } from './user/user.module';
@@ -42,6 +43,7 @@ import { LoggingInterceptor } from './utils/loggerInterceptor';
     ProposalRequestModule,
     RepositoryModule,
     TaskModule,
+    SettingsModule,
   ],
   providers: [
     {

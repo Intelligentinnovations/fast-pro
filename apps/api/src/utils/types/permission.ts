@@ -32,4 +32,6 @@ export enum Permission {
   VIEW_TASK = 'VIEW_TASK',
   UPDATE_TASK = 'UPDATE_TASK',
   DELETE_TASK = 'DELETE_TASK',
+
+  DELETE_ACCOUNT = 'DELETE_ACCOUNT',
 }
