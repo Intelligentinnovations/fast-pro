@@ -17,6 +17,7 @@ import { StaffModule } from './staff/staff.module';
 import { TaskModule } from './task/task.module';
 import { UserModule } from './user/user.module';
 import { LoggingInterceptor } from './utils/loggerInterceptor';
+import { ProfileModule } from './profile/profile.module';
 
 @Module({
   imports: [
@@ -44,6 +45,7 @@ import { LoggingInterceptor } from './utils/loggerInterceptor';
     RepositoryModule,
     TaskModule,
     SettingsModule,
+    ProfileModule,
   ],
   providers: [
     {
