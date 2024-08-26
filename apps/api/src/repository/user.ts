@@ -93,6 +93,33 @@ export class UserRepo {
       .executeTakeFirst();
   }
 
+  async getUserProfile(id: string) {
+    return this.client
+      .selectFrom('User')
+      .leftJoin('Organization', 'User.organizationId', 'Organization.id')
+      .select([
+        'User.id',
+        'firstname',
+        'lastname',
+        'User.email',
+        'User.address',
+        'biography',
+        'User.phoneNumber',
+        'profileImage',
+        'title',
+        'Organization.id as organizationId',
+        'Organization.name as organizationName',
+        'Organization.phoneNumber as organizationPhoneNumber',
+        'Organization.address as organizationAddress',
+        'Organization.logo as organizationLogo',
+        'Organization.email as organizationEmail',
+        'Organization.websiteUrl as organizationWebsiteUrl',
+        'Organization.description as organizationDescription',
+      ])
+      .where('User.id', '=', id)
+      .executeTakeFirst();
+  }
+
   async updateUserByEmail({
     email,
     payload,

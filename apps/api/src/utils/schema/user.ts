@@ -51,6 +51,16 @@ export const UpdateUserProfileSchema = z.object({
   profileImage: z.string().optional(),
 });
 
+export const UpdateCompanyProfileSchema = z.object({
+  logo: z.string().optional(),
+  name: z.string().optional(),
+  email: z.string().optional(),
+  phoneNumber: z.string().optional(),
+  address: z.string().optional(),
+  websiteUrl: z.string().optional(),
+  description: z.string().optional(),
+});
+
 export type CompleteVendorRegistrationPayload = z.infer<
   typeof CompleteVendorRegistrationSchema
 >;
@@ -64,4 +74,8 @@ export type CreateStaffAccountPayload = z.infer<
 >;
 export type CreateAdminAccountPayload = z.infer<
   typeof CreateAdminAccountSchema
+>;
+
+export type UpdateCompanyProfilePayload = z.infer<
+  typeof UpdateCompanyProfileSchema
 >;
