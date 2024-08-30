@@ -81,6 +81,48 @@ export type Permission = {
   created_at: Generated<Timestamp>;
   updated_at: Timestamp | null;
 };
+export type Product = {
+  id: Generated<string>;
+  categoryId: string;
+  vendorId: string;
+  name: string;
+  basePrice: string;
+  quantity: Generated<number>;
+  description: string | null;
+  created_at: Generated<Timestamp>;
+  updated_at: Timestamp | null;
+};
+export type ProductCategory = {
+  id: Generated<string>;
+  name: string;
+  created_at: Generated<Timestamp>;
+  updated_at: Timestamp | null;
+};
+export type ProductImage = {
+  id: Generated<string>;
+  productId: string;
+  imageUrl: string;
+  isPrimary: Generated<boolean>;
+  createdAt: Generated<Timestamp>;
+  updated_at: Timestamp | null;
+};
+export type ProductSpecification = {
+  id: Generated<string>;
+  productId: string;
+  title: string;
+  value: string;
+  createdAt: Generated<Timestamp>;
+  updated_at: Timestamp | null;
+};
+export type ProductVariant = {
+  id: Generated<string>;
+  productId: string;
+  name: string;
+  quantity: number;
+  price: string;
+  createdAt: Generated<Timestamp>;
+  updated_at: Timestamp | null;
+};
 export type Proposal = {
   id: Generated<string>;
   organizationId: string;
@@ -183,6 +225,11 @@ export type DB = {
   Invite: Invite;
   Organization: Organization;
   Permission: Permission;
+  Product: Product;
+  ProductCategory: ProductCategory;
+  ProductImage: ProductImage;
+  ProductSpecification: ProductSpecification;
+  ProductVariant: ProductVariant;
   Proposal: Proposal;
   ProposalCategory: ProposalCategory;
   ProposalRequest: ProposalRequest;

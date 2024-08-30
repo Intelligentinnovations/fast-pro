@@ -6,3 +6,4 @@ export * from './settings';
 export * from './staff';
 export * from './task';
 export * from './user';
+export * from './product';

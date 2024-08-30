@@ -76,22 +76,6 @@ export class UserRepo {
       .where('email', '=', email)
       .executeTakeFirst();
   }
-  async getUserById(id: string) {
-    return this.client
-      .selectFrom('User')
-      .select([
-        'id',
-        'firstname',
-        'lastname',
-        'email',
-        'address',
-        'biography',
-        'phoneNumber',
-        'title',
-      ])
-      .where('id', '=', id)
-      .executeTakeFirst();
-  }
 
   async getUserProfile(id: string) {
     return this.client
