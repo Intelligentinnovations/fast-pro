@@ -5,9 +5,9 @@ import {
   CreateProposalRequestPayload,
   DB,
   paginate,
-  PaginationParams,
   ProposalRequest,
   ProposalRequestData,
+  QueryParams,
 } from '../utils';
 
 @Injectable()
@@ -31,7 +31,7 @@ export class ProposalRequestRepo {
   }: {
     proposalId: string;
     organizationId: string;
-    pagination: PaginationParams;
+    pagination: QueryParams;
   }) {
     const queryBuilder = this.client
       .selectFrom('ProposalRequest')
@@ -61,7 +61,7 @@ export class ProposalRequestRepo {
     pagination,
   }: {
     vendorId: string;
-    pagination: PaginationParams;
+    pagination: QueryParams;
   }) {
     const queryBuilder = this.client
       .selectFrom('ProposalRequest')

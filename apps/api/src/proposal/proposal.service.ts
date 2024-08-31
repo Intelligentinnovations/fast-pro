@@ -5,7 +5,7 @@ import { ProposalRepo } from '../repository/proposal';
 import { ProposalRequestRepo } from '../repository/proposalRequest';
 import {
   CreateProposalPayload,
-  PaginationParams,
+  QueryParams,
   UpdateProposalPayload,
 } from '../utils';
 
@@ -38,7 +38,7 @@ export class ProposalService {
     organizationId,
     pagination,
   }: {
-    pagination: PaginationParams;
+    pagination: QueryParams;
     organizationId: string;
   }): Promise<IServiceHelper> {
     const proposals = await this.proposalRepo.fetchOrganizationProposals({
@@ -52,9 +52,7 @@ export class ProposalService {
     };
   }
 
-  async fetchAllProposals(
-    pagination: PaginationParams
-  ): Promise<IServiceHelper> {
+  async fetchAllProposals(pagination: QueryParams): Promise<IServiceHelper> {
     const proposals = await this.proposalRepo.fetchAllProposals(pagination);
     return {
       status: 'successful',

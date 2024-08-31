@@ -5,8 +5,8 @@ import {
   CreateProposalPayload,
   DB,
   paginate,
-  PaginationParams,
   Proposal,
+  QueryParams,
   UpdateProposalPayload,
 } from '../utils';
 
@@ -34,7 +34,7 @@ export class ProposalRepo {
     pagination,
     organizationId,
   }: {
-    pagination: PaginationParams;
+    pagination: QueryParams;
     organizationId: string;
   }) {
     const queryBuilder = this.client
@@ -64,7 +64,7 @@ export class ProposalRepo {
     });
   }
 
-  async fetchAllProposals(pagination: PaginationParams) {
+  async fetchAllProposals(pagination: QueryParams) {
     const queryBuilder = this.client
       .selectFrom('Proposal')
       .innerJoin(

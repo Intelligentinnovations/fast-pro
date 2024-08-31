@@ -6,7 +6,7 @@ import {
   DB,
   Invite,
   paginate,
-  PaginationParams,
+  QueryParams,
 } from '../utils';
 import { UpdateInvitePayload } from '../utils/types/invite';
 
@@ -57,7 +57,7 @@ export class InviteRepo {
     pagination,
     organizationId,
   }: {
-    pagination: PaginationParams;
+    pagination: QueryParams;
     organizationId: string;
   }) {
     const queryBuilder = this.client

@@ -9,7 +9,7 @@ import {
   DB,
   Invite,
   paginate,
-  PaginationParams,
+  QueryParams,
   UpdateUserPayload,
   UserData,
   UserStatus,
@@ -74,22 +74,6 @@ export class UserRepo {
       .selectFrom('User')
       .select(['id', 'email', 'firstname', 'lastname', 'password'])
       .where('email', '=', email)
-      .executeTakeFirst();
-  }
-  async getUserById(id: string) {
-    return this.client
-      .selectFrom('User')
-      .select([
-        'id',
-        'firstname',
-        'lastname',
-        'email',
-        'address',
-        'biography',
-        'phoneNumber',
-        'title',
-      ])
-      .where('id', '=', id)
       .executeTakeFirst();
   }
 
@@ -222,7 +206,7 @@ export class UserRepo {
     currentUserId,
   }: {
     organizationId: string;
-    pagination: PaginationParams;
+    pagination: QueryParams;
     currentUserId: string;
   }) {
     const queryBuilder = this.client

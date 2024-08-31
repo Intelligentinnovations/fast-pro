@@ -33,8 +33,8 @@ import {
 import {
   CreateStaffAccountPayload,
   CreateStaffAccountSchema,
-  PaginationParams,
   Permission,
+  QueryParams,
 } from '../utils';
 import { StaffService } from './staff.service';
 
@@ -80,7 +80,7 @@ export class StaffController {
   @ApiForbiddenResponse({ description: 'Insufficient permission' })
   async getStaff(
     @Request() req: FastifyRequest,
-    @Query() paginationData: PaginationParams
+    @Query() paginationData: QueryParams
   ) {
     const data = await this.staffService.fetchStaff({
       organizationId: req.user?.organizationId as string,

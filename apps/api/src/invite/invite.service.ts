@@ -4,7 +4,7 @@ import { Injectable } from '@nestjs/common';
 import { InviteRepo } from '../repository';
 import {
   CreateInvitePayload,
-  PaginationParams,
+  QueryParams,
   UpdateInvitePayload,
 } from '../utils';
 
@@ -44,7 +44,7 @@ export class InviteService {
     paginationData,
   }: {
     organizationId: string;
-    paginationData: PaginationParams;
+    paginationData: QueryParams;
   }): Promise<IServiceHelper> {
     const invites = await this.inviteRepo.fetchInvites({
       pagination: paginationData,

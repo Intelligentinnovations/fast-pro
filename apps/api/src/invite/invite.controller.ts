@@ -35,8 +35,8 @@ import {
 import {
   CreateInvitePayload,
   CreateInviteSchema,
-  PaginationParams,
   Permission,
+  QueryParams,
   UpdateInvitePayload,
   UpdateInviteSchema,
 } from '../utils';
@@ -124,7 +124,7 @@ export class InviteController {
   @ApiForbiddenResponse({ description: 'Insufficient permission' })
   async getStaff(
     @Request() req: FastifyRequest,
-    @Query() paginationData: PaginationParams
+    @Query() paginationData: QueryParams
   ) {
     const data = await this.staffService.fetchInvites({
       organizationId: req.user?.organizationId as string,

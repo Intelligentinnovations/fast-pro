@@ -6,7 +6,7 @@ import {
   CreateTaskPayload,
   DB,
   paginate,
-  PaginationParams,
+  QueryParams,
   UpdateTaskPayload,
 } from '../utils';
 
@@ -27,7 +27,7 @@ export class TaskRepo {
 
   async fetchTasks(payload: {
     organizationId: string;
-    pagination: PaginationParams;
+    pagination: QueryParams;
   }) {
     const { pagination, organizationId } = payload;
     const queryBuilder = this.client

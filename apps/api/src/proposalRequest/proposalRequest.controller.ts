@@ -31,8 +31,8 @@ import {
 import {
   CreateProposalRequestPayload,
   CreateProposalRequestSchema,
-  PaginationParams,
   Permission,
+  QueryParams,
 } from '../utils';
 import { ProposalRequestService } from './proposalRequest.service';
 
@@ -113,7 +113,7 @@ export class ProposalRequestController {
   @ApiOkResponse({ description: 'Proposal request fetched successfully' })
   async fetchProposal(
     @Request() req: FastifyRequest,
-    @Query() pagination: PaginationParams
+    @Query() pagination: QueryParams
   ) {
     const data = await this.proposalRequestService.fetchVendorProposalRequests({
       vendorId: req.user?.vendorId as string,
@@ -140,7 +140,7 @@ export class ProposalRequestController {
   @ApiOkResponse({ description: 'Proposal requests fetched successfully' })
   async fetchProposals(
     @Request() req: FastifyRequest,
-    @Query() pagination: PaginationParams,
+    @Query() pagination: QueryParams,
     @Param('id') proposalId: string
   ) {
     const data =
