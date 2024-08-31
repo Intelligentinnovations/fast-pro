@@ -35,8 +35,8 @@ import {
 import {
   CreateTaskPayload,
   CreateTaskSchema,
-  PaginationParams,
   Permission,
+  QueryParams,
   UpdateTaskPayload,
   UpdateTaskSchema,
 } from '../utils';
@@ -127,7 +127,7 @@ export class TaskController {
   @ApiForbiddenResponse({ description: 'Insufficient permission' })
   async getTask(
     @Request() req: FastifyRequest,
-    @Query() paginationData: PaginationParams
+    @Query() paginationData: QueryParams
   ) {
     const data = await this.taskService.fetchTasks({
       organizationId: req.user?.organizationId as string,

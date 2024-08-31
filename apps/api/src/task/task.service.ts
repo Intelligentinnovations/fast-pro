@@ -2,11 +2,7 @@ import { IServiceHelper } from '@backend-template/types';
 import { Injectable } from '@nestjs/common';
 
 import { TaskRepo } from '../repository';
-import {
-  CreateTaskPayload,
-  PaginationParams,
-  UpdateTaskPayload,
-} from '../utils';
+import { CreateTaskPayload, QueryParams, UpdateTaskPayload } from '../utils';
 
 @Injectable()
 export class TaskService {
@@ -41,7 +37,7 @@ export class TaskService {
     paginationData,
   }: {
     organizationId: string;
-    paginationData: PaginationParams;
+    paginationData: QueryParams;
   }): Promise<IServiceHelper> {
     const tasks = await this.taskRepo.fetchTasks({
       pagination: paginationData,

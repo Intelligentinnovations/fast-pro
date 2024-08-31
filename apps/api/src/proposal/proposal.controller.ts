@@ -32,8 +32,8 @@ import {
 import {
   CreateProposalPayload,
   CreateProposalSchema,
-  PaginationParams,
   Permission,
+  QueryParams,
   UpdateProposalPayload,
   UpdateProposalSchema,
 } from '../utils';
@@ -113,7 +113,7 @@ export class ProposalController {
   @ApiOkResponse({ description: 'Proposals fetched successfully' })
   async fetchOrganizationProposals(
     @Request() req: FastifyRequest,
-    @Query() pagination: PaginationParams
+    @Query() pagination: QueryParams
   ) {
     const data = await this.proposalServices.fetchOrganizationProposals({
       organizationId: req.user?.organizationId as string,
@@ -138,7 +138,7 @@ export class ProposalController {
   @ApiOkResponse({ description: 'Proposals fetched successfully' })
   async fetchProposals(
     @Request() req: FastifyRequest,
-    @Query() pagination: PaginationParams
+    @Query() pagination: QueryParams
   ) {
     const data = await this.proposalServices.fetchAllProposals(pagination);
     return convertAndSendResponse(data);

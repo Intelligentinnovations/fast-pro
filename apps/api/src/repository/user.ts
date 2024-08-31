@@ -9,7 +9,7 @@ import {
   DB,
   Invite,
   paginate,
-  PaginationParams,
+  QueryParams,
   UpdateUserPayload,
   UserData,
   UserStatus,
@@ -206,7 +206,7 @@ export class UserRepo {
     currentUserId,
   }: {
     organizationId: string;
-    pagination: PaginationParams;
+    pagination: QueryParams;
     currentUserId: string;
   }) {
     const queryBuilder = this.client

@@ -4,6 +4,8 @@ import {
   Body,
   Controller,
   Get,
+  NotFoundException,
+  Param,
   Post,
   Query,
   Req,
@@ -14,12 +16,15 @@ import {
   ApiBadRequestResponse,
   ApiBearerAuth,
   ApiBody,
+  ApiNotFoundResponse,
   ApiOkResponse,
   ApiOperation,
+  ApiParam,
   ApiQuery,
   ApiTags,
 } from '@nestjs/swagger';
 import { FastifyRequest } from 'fastify';
+import { string } from 'zod';
 
 import {
   AuthGuard,
@@ -29,8 +34,8 @@ import {
 import {
   AddProductPayload,
   AddProductSchema,
-  PaginationParams,
   Permission,
+  ProductFilters,
   UserData,
 } from '../utils';
 import { AddProductDto } from './dto/addProductDto';
@@ -62,22 +67,67 @@ export class ProductController {
   @Get('')
   @ApiQuery({
     name: 'page',
-    type: Number,
+    required: false,
     description: 'Page number',
   })
   @ApiQuery({
     name: 'limit',
-    type: Number,
+    required: false,
     description: 'Number of items per page',
   })
+
+  @ApiQuery({
+    name: 'productCategoryNames',
+    type: Array,
+    required: false,
+    description: 'Array of product category to filter by',
+  })
+  @ApiQuery({
+    name: 'minPrice',
+    required: false,
+    description: 'Filter by min price',
+  })
+  @ApiQuery({
+    name: 'maxPrice',
+    required: false,
+    description: 'Filter by max price',
+  })
+  @ApiQuery({
+    name: 'sortBy',
+    required: false,
+    description: 'Sort by price',
+    enum: ['price'],
+
+  })
+  @ApiQuery({
+    name: 'sortOrder',
+    required: false,
+    description: 'Sort order (asc or desc)',
+    enum: ['asc', 'desc'],
+  })
+
   @ApiOperation({ summary: 'Get all products' })
-  @ApiOkResponse({ description: `Products fetched successful` })
+  @ApiOkResponse({ description: 'Products fetched successfully' })
   async fetchProducts(
     @Req() req: FastifyRequest,
-    @Query() pagination: PaginationParams
+    @Query() searchQuery: ProductFilters
   ) {
     const user = req.user as UserData;
-    const data = await this.productService.fetchProducts({ user, pagination });
+    const data = await this.productService.fetchProducts({
+      user,
+      query: searchQuery,
+    });
     return convertAndSendResponse(data);
+  }
+  @Get(':id')
+  @ApiOperation({ summary: 'Get product by ID' })
+  @ApiParam({ name: 'id', required: true, description: 'Product ID' })
+  @ApiOkResponse({ description: 'Product fetched successfully' })
+  @ApiNotFoundResponse({ description: 'Product not found' })
+  async getProduct(
+    @Param('id') id: string,
+  ) {
+    const product = await this.productService.getProduct(id);
+    return convertAndSendResponse(product);
   }
 }

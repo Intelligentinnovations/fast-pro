@@ -5,7 +5,7 @@ import jwt from 'jsonwebtoken';
 
 import { InviteRepo, UserRepo } from '../repository';
 import { SecretsService } from '../secrets/secrets.service';
-import { CreateStaffAccountPayload, PaginationParams } from '../utils';
+import { CreateStaffAccountPayload, QueryParams } from '../utils';
 
 @Injectable()
 export class StaffService {
@@ -69,7 +69,7 @@ export class StaffService {
     currentUserId,
   }: {
     organizationId: string;
-    paginationData: PaginationParams;
+    paginationData: QueryParams;
     currentUserId: string;
   }): Promise<IServiceHelper> {
     const staff = await this.userRepo.fetchOrganizationUsers({

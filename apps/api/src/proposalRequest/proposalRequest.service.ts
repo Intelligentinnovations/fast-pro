@@ -2,7 +2,7 @@ import { IServiceHelper } from '@backend-template/types';
 import { Injectable } from '@nestjs/common';
 
 import { ProposalRequestRepo } from '../repository/proposalRequest';
-import { CreateProposalRequestPayload, PaginationParams } from '../utils';
+import { CreateProposalRequestPayload, QueryParams } from '../utils';
 
 @Injectable()
 export class ProposalRequestService {
@@ -25,7 +25,7 @@ export class ProposalRequestService {
     pagination,
     organizationId,
   }: {
-    pagination: PaginationParams;
+    pagination: QueryParams;
     organizationId: string;
     proposalId: string;
   }): Promise<IServiceHelper> {
@@ -46,7 +46,7 @@ export class ProposalRequestService {
     pagination,
     vendorId,
   }: {
-    pagination: PaginationParams;
+    pagination: QueryParams;
     vendorId: string;
   }): Promise<IServiceHelper> {
     const proposalRequests =
