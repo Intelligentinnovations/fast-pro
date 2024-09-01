@@ -8,6 +8,7 @@ import { UserRepo } from './user';
 import { VendorRepo } from './vendor';
 import { TaskRepo } from './task';
 import { ProductRepo } from './product';
+import { CartRepository } from './cart';
 
 @Global()
 @Module({
@@ -20,6 +21,7 @@ import { ProductRepo } from './product';
     ProposalRequestRepo,
     TaskRepo,
     ProductRepo,
+    CartRepository,
   ],
   exports: [
     InviteRepo,
@@ -30,6 +32,7 @@ import { ProductRepo } from './product';
     ProposalRequestRepo,
     TaskRepo,
     ProductRepo,
+    CartRepository,
   ],
 })
 export class RepositoryModule {}
