@@ -41,6 +41,13 @@ export const TaskStatus = {
   completed: 'completed',
 } as const;
 export type TaskStatus = (typeof TaskStatus)[keyof typeof TaskStatus];
+export type CartItem = {
+  id: Generated<string>;
+  userId: string;
+  productId: string;
+  variantId: string | null;
+  quantity: number;
+};
 export type Department = {
   id: Generated<string>;
   organizationId: string;
@@ -221,6 +228,7 @@ export type Vendor = {
   updated_at: Timestamp | null;
 };
 export type DB = {
+  CartItem: CartItem;
   Department: Department;
   Invite: Invite;
   Organization: Organization;

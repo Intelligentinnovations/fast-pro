@@ -5,6 +5,7 @@ import { APP_INTERCEPTOR } from '@nestjs/core';
 import { redisStore } from 'cache-manager-redis-yet';
 
 import { AuthModule } from './auth/auth.module';
+import { CartModule } from './cart/cart.module';
 import { InviteModule } from './invite/invite.module';
 import { LibrariesModule } from './libraries/libraries';
 import { ProductModule } from './product/product.module';
@@ -48,6 +49,7 @@ import { LoggingInterceptor } from './utils/loggerInterceptor';
     SettingsModule,
     ProfileModule,
     ProductModule,
+    CartModule,
   ],
   providers: [
     {
