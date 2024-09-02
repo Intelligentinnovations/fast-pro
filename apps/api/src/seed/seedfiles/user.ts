@@ -6,8 +6,10 @@ import { dbClient } from '../db';
 import { ADMIN_ROLE_ID, REQUESTER_ROLE_ID, VENDOR_ROLE_ID } from './roles';
 
 const organizationId = '1ab2610e-b332-46f3-b43e-f740912142e1';
-const vendorId = randomUUID();
+const vendorId = 'd8daaf29-c35d-420d-8026-b8bfbe4e1c3c';
+const vendorId2 = 'd8daaf29-c35d-420d-8026-b8bfbe4e1c37';
 const vendorUserId = randomUUID();
+const vendorUserId2 = randomUUID();
 
 const UserSeed = {
   run: async () => {
@@ -34,11 +36,18 @@ const UserSeed = {
 
     await dbClient
       .insertInto('Vendor')
-      .values({
-        id: vendorId,
-        name: 'Dangote Groups',
-        status: 'active',
-      })
+      .values([
+        {
+          id: vendorId,
+          name: 'Big Tech Devices',
+          status: 'active',
+        },
+        {
+          id: vendorId2,
+          name: 'Apple Store',
+          status: 'active',
+        },
+      ])
       .execute();
 
     await dbClient
@@ -71,6 +80,15 @@ const UserSeed = {
           password: bcrypt.hashSync('password', 10),
           status: UserStatus.active,
         },
+        {
+          id: vendorUserId2,
+          firstname: 'Sarah',
+          lastname: 'Johnson',
+          vendorId: vendorId2,
+          email: 'sarah@johnson.com',
+          password: bcrypt.hashSync('password', 10),
+          status: UserStatus.active,
+        },
       ])
       .execute();
 
@@ -91,6 +109,10 @@ const UserSeed = {
         },
         {
           userId: vendorUserId,
+          roleId: VENDOR_ROLE_ID, // assign vendor role
+        },
+        {
+          userId: vendorUserId2,
           roleId: VENDOR_ROLE_ID, // assign vendor role
         },
       ])

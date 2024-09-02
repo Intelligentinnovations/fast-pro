@@ -19,8 +19,8 @@ const VariantSchema = z.object({
 export const AddProductSchema = z.object({
   name: z.string(),
   categoryId: z.string(),
-  price: z.string(),
-  quantity: z.number().nonnegative(),
+  price: z.string().optional(),
+  quantity: z.number().nonnegative().optional(),
   description: z.string(),
   images: z.array(ImageSchema).optional(),
   specifications: z.array(SpecificationSchema).optional(),

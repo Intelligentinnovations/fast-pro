@@ -1,12 +1,12 @@
 import { IServiceHelper } from '@backend-template/types';
 import { Injectable } from '@nestjs/common';
 
-import { CartRepository } from '../repository/cart';
+import { CartRepository } from '../repository';
 import { AddProductToCartPayload } from './dto/addProductToCartDto';
 
 @Injectable()
 export class CartService {
-  constructor(private cartRepo: CartRepository) { }
+  constructor(private cartRepo: CartRepository) {}
 
   async addProductToCart({
     userId,
@@ -45,7 +45,10 @@ export class CartService {
     };
   }
 
-  async removeCartItem(ids: { userId: string; id: string }): Promise<IServiceHelper> {
+  async removeCartItem(ids: {
+    userId: string;
+    id: string;
+  }): Promise<IServiceHelper> {
     await this.cartRepo.deleteCartItem(ids);
     return {
       status: 'deleted',

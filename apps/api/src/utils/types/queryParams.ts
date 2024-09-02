@@ -1,3 +1,5 @@
+import { ProcurementStatus } from './database';
+
 export interface PaginationResult<T> {
   data: T[];
   page: number;
@@ -9,12 +11,16 @@ export interface PaginationResult<T> {
 export interface QueryParams {
   page: number;
   limit: number;
+  sortBy?: string;
+  sortOrder?: 'asc' | 'desc';
 }
 
 export interface ProductFilters extends QueryParams {
   productCategoryNames?: string[];
   minPrice?: string;
   maxPrice?: string;
-  sortBy?: string,
-  sortOrder?: 'asc' | 'desc',
+}
+
+export interface ProcurementFilters extends QueryParams {
+  status?: ProcurementStatus;
 }

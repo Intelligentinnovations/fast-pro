@@ -4,7 +4,6 @@ import {
   Body,
   Controller,
   Get,
-  NotFoundException,
   Param,
   Post,
   Query,
@@ -24,7 +23,6 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { FastifyRequest } from 'fastify';
-import { string } from 'zod';
 
 import {
   AuthGuard,
@@ -75,7 +73,6 @@ export class ProductController {
     required: false,
     description: 'Number of items per page',
   })
-
   @ApiQuery({
     name: 'productCategoryNames',
     type: Array,
@@ -97,7 +94,6 @@ export class ProductController {
     required: false,
     description: 'Sort by price',
     enum: ['price'],
-
   })
   @ApiQuery({
     name: 'sortOrder',
@@ -105,7 +101,6 @@ export class ProductController {
     description: 'Sort order (asc or desc)',
     enum: ['asc', 'desc'],
   })
-
   @ApiOperation({ summary: 'Get all products' })
   @ApiOkResponse({ description: 'Products fetched successfully' })
   async fetchProducts(
@@ -124,9 +119,7 @@ export class ProductController {
   @ApiParam({ name: 'id', required: true, description: 'Product ID' })
   @ApiOkResponse({ description: 'Product fetched successfully' })
   @ApiNotFoundResponse({ description: 'Product not found' })
-  async getProduct(
-    @Param('id') id: string,
-  ) {
+  async getProduct(@Param('id') id: string) {
     const product = await this.productService.getProduct(id);
     return convertAndSendResponse(product);
   }

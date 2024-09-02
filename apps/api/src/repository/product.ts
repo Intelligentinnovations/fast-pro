@@ -5,6 +5,7 @@ import {
   AddProductPayload,
   DB,
   paginate,
+  Product,
   ProductDetails,
   ProductFilters,
   UserData,
@@ -42,26 +43,23 @@ export class ProductRepo {
       const { price: _, ...baseProductDetailsWithoutPrice } =
         baseProductDetails;
 
-      const baseProduct = await trx
-        .insertInto('Product')
-        .values({
-          ...baseProductDetailsWithoutPrice,
-          quantity: hasVariant ? totalQuantity : baseProductDetails.quantity,
-          vendorId,
-          basePrice: hasVariant
-            ? smallestPrice.toString()
-            : baseProductDetails.price,
-        })
-        .returning([
-          'id',
-          'basePrice',
-          'vendorId',
-          'name',
-          'description',
-          'quantity',
-          'categoryId',
-        ])
+
+      const baseProduct = await trx.insertInto('Product').values({
+        basePrice: (hasVariant ? smallestPrice : baseProductDetails.price) as string,
+        ...baseProductDetailsWithoutPrice,
+        vendorId,
+        quantity: hasVariant ? totalQuantity : baseProductDetails.quantity
+      }).returning([
+        'id',
+        'basePrice',
+        'vendorId',
+        'name',
+        'description',
+        'quantity',
+        'categoryId',
+      ])
         .executeTakeFirst();
+
       const productId = baseProduct?.id as string;
       const productImagesWithProductId =
         images?.map((image) => ({
@@ -117,28 +115,24 @@ export class ProductRepo {
     searchQuery: ProductFilters;
     user: UserData;
   }) {
-    let query = this.client
+    let baseQuery = this.client
       .selectFrom('Product')
       .innerJoin('Vendor', 'Vendor.id', 'Product.vendorId')
-      .leftJoin('ProductImage', 'ProductImage.productId', 'Product.id')
-      .where('ProductImage.isPrimary', '=', true)
-      .select([
-        'Product.id',
-        'Product.name',
-        'Product.description',
-        'Product.basePrice as price',
-        'Vendor.name as vendorName',
-        'ProductImage.imageUrl as primaryImageUrl',
-      ]);
+      .leftJoin('ProductImage', (join) =>
+        join
+          .onRef('ProductImage.productId', '=', 'Product.id')
+          .on('ProductImage.isPrimary', '=', true)
+      );
+
     if (user.vendorId) {
-      query = query.where('Product.vendorId', '=', user.vendorId);
+      baseQuery = baseQuery.where('Product.vendorId', '=', user.vendorId);
     }
 
     if (
       searchQuery.productCategoryNames &&
       searchQuery.productCategoryNames.length > 0
     ) {
-      query = query
+      baseQuery = baseQuery
         .innerJoin(
           'ProductCategory',
           'ProductCategory.id',
@@ -148,35 +142,42 @@ export class ProductRepo {
     }
 
     if (searchQuery.minPrice) {
-      query = query.where('Product.basePrice', '>=', searchQuery.minPrice);
+      baseQuery = baseQuery.where('Product.basePrice', '>=', searchQuery.minPrice);
     }
     if (searchQuery.maxPrice) {
-      query = query.where('Product.basePrice', '<=', searchQuery.maxPrice);
+      baseQuery = baseQuery.where('Product.basePrice', '<=', searchQuery.maxPrice);
     }
+
+    let dataQuery = baseQuery
+      .select([
+        'Product.id',
+        'Product.name',
+        'Product.description',
+        'Product.basePrice as price',
+        'Vendor.name as vendorName',
+        'ProductImage.imageUrl as primaryImageUrl',
+      ])
+
     if (searchQuery.sortBy === 'price') {
-      query = query.orderBy('Product.basePrice', searchQuery.sortOrder);
+      dataQuery = dataQuery.orderBy('Product.basePrice', searchQuery.sortOrder);
     }
 
-    query = query.groupBy([
-      'Product.id',
-      'Product.name',
-      'Product.description',
-      'Product.basePrice',
-      'Vendor.name',
-      'ProductImage.imageUrl',
-    ]);
-
-    return paginate({
-      queryBuilder: query,
+    return paginate<Product>({
+      queryBuilder: dataQuery,
       pagination: searchQuery,
       identifier: 'Product.id',
     });
   }
   async fetchProductById(id: string) {
-    const results = await this.client.selectFrom('Product')
+    const results = await this.client
+      .selectFrom('Product')
       .innerJoin('Vendor', 'Vendor.id', 'Product.vendorId')
       .leftJoin('ProductImage', 'ProductImage.productId', 'Product.id')
-      .leftJoin('ProductSpecification', 'ProductSpecification.productId', 'Product.id')
+      .leftJoin(
+        'ProductSpecification',
+        'ProductSpecification.productId',
+        'Product.id'
+      )
       .leftJoin('ProductVariant', 'ProductVariant.productId', 'Product.id')
       .select([
         'Product.id',
@@ -192,38 +193,42 @@ export class ProductRepo {
         'ProductVariant.price as variantPrice',
       ])
       .where('Product.id', '=', id)
-      .execute()
+      .execute();
 
-      if (results.length === 0) return {};
-      const product: ProductDetails = {
-        id: results[0]?.id as string,
-        name: results[0]?.name ?? '',
-        description: results[0]?.description ?? '',
-        price: results[0]?.price ? Number(results[0].price) : 0,
-        vendorName: results[0]?.vendorName ?? '',
-        images: [],
-        specifications: [],
-        variants: [],
-      };
-      for (const row of results) {
-        if (row.imageUrl && !product.images.includes(row.imageUrl)) {
-          product.images.push(row.imageUrl);
-        }
-        if (row.spec && row.specValue && !product.specifications.some(s => s.name === row.spec)) {
-          product.specifications.push({ name: row.spec, value: row.specValue });
-        }
-        if (row.variantId) {
-          const variant = {
-            id: row.variantId as string,
-            name: row.variantName as string,
-            price: Number(row.variantPrice),
-          };
-          if (!product.variants.some(v => v.id === variant.id)) {
-            product.variants.push(variant);
-          }
+    if (results.length === 0) return {};
+    const product: ProductDetails = {
+      id: results[0]?.id as string,
+      name: results[0]?.name ?? '',
+      description: results[0]?.description ?? '',
+      price: results[0]?.price ? Number(results[0].price) : 0,
+      vendorName: results[0]?.vendorName ?? '',
+      images: [],
+      specifications: [],
+      variants: [],
+    };
+    for (const row of results) {
+      if (row.imageUrl && !product.images.includes(row.imageUrl)) {
+        product.images.push(row.imageUrl);
+      }
+      if (
+        row.spec &&
+        row.specValue &&
+        !product.specifications.some((s) => s.name === row.spec)
+      ) {
+        product.specifications.push({ name: row.spec, value: row.specValue });
+      }
+      if (row.variantId) {
+        const variant = {
+          id: row.variantId as string,
+          name: row.variantName as string,
+          price: Number(row.variantPrice),
+        };
+        if (!product.variants.some((v) => v.id === variant.id)) {
+          product.variants.push(variant);
         }
       }
+    }
 
-      return product;
+    return product;
   }
 }

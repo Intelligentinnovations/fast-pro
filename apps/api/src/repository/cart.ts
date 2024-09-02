@@ -9,7 +9,7 @@ import { DB } from '../utils';
 
 @Injectable()
 export class CartRepository {
-  constructor(private client: KyselyService<DB>) { }
+  constructor(private client: KyselyService<DB>) {}
 
   async fetchCartItem({
     userId,
@@ -56,8 +56,6 @@ export class CartRepository {
       .where('CartItem.userId', '=', userId)
       .where('ProductImage.isPrimary', '=', true)
       .execute();
-
-    if (!cartItems.length) return [];
 
     const results = cartItems.map(
       ({
@@ -111,11 +109,18 @@ export class CartRepository {
     return query.execute();
   }
 
-  async deleteCartItem({ userId, id }: { userId: string, id: string }) {
+  async deleteCartItem({ userId, id }: { userId: string; id: string }) {
     return this.client
       .deleteFrom('CartItem')
       .where('userId', '=', userId)
       .where('id', '=', id)
+      .execute();
+  }
+
+  async clearCartItems(userId: string) {
+    return this.client
+      .deleteFrom('CartItem')
+      .where('userId', '=', userId)
       .execute();
   }
 }

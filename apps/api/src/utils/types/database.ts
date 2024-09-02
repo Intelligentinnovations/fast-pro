@@ -41,12 +41,22 @@ export const TaskStatus = {
   completed: 'completed',
 } as const;
 export type TaskStatus = (typeof TaskStatus)[keyof typeof TaskStatus];
+export const ProcurementStatus = {
+  created: 'created',
+  pending: 'pending',
+  approved: 'approved',
+  declined: 'declined',
+} as const;
+export type ProcurementStatus =
+  (typeof ProcurementStatus)[keyof typeof ProcurementStatus];
 export type CartItem = {
   id: Generated<string>;
   userId: string;
   productId: string;
   variantId: string | null;
   quantity: number;
+  created_at: Generated<Timestamp>;
+  updated_at: Timestamp | null;
 };
 export type Department = {
   id: Generated<string>;
@@ -88,6 +98,31 @@ export type Permission = {
   created_at: Generated<Timestamp>;
   updated_at: Timestamp | null;
 };
+export type Procurement = {
+  id: Generated<string>;
+  userId: string;
+  organizationId: string;
+  itemDetails: string;
+  amount: string;
+  status: Generated<ProcurementStatus>;
+  requiredDate: Timestamp;
+  justification: string;
+  paymentTerms: string;
+  documents: string[];
+  created_at: Generated<Timestamp>;
+  updated_at: Timestamp | null;
+};
+export type ProcurementItem = {
+  id: Generated<string>;
+  procurementId: string;
+  productId: string;
+  variantId: string | null;
+  quantity: number;
+  unitPrice: string;
+  totalPrice: string;
+  created_at: Generated<Timestamp>;
+  updated_at: Timestamp | null;
+};
 export type Product = {
   id: Generated<string>;
   categoryId: string;
@@ -95,7 +130,7 @@ export type Product = {
   name: string;
   basePrice: string;
   quantity: Generated<number>;
-  description: string | null;
+  description: string;
   created_at: Generated<Timestamp>;
   updated_at: Timestamp | null;
 };
@@ -110,7 +145,7 @@ export type ProductImage = {
   productId: string;
   imageUrl: string;
   isPrimary: Generated<boolean>;
-  createdAt: Generated<Timestamp>;
+  created_at: Generated<Timestamp>;
   updated_at: Timestamp | null;
 };
 export type ProductSpecification = {
@@ -118,7 +153,7 @@ export type ProductSpecification = {
   productId: string;
   title: string;
   value: string;
-  createdAt: Generated<Timestamp>;
+  created_at: Generated<Timestamp>;
   updated_at: Timestamp | null;
 };
 export type ProductVariant = {
@@ -127,7 +162,7 @@ export type ProductVariant = {
   name: string;
   quantity: number;
   price: string;
-  createdAt: Generated<Timestamp>;
+  created_at: Generated<Timestamp>;
   updated_at: Timestamp | null;
 };
 export type Proposal = {
@@ -233,6 +268,8 @@ export type DB = {
   Invite: Invite;
   Organization: Organization;
   Permission: Permission;
+  Procurement: Procurement;
+  ProcurementItem: ProcurementItem;
   Product: Product;
   ProductCategory: ProductCategory;
   ProductImage: ProductImage;
