@@ -13,6 +13,9 @@ export class AddProcurementDto {
   paymentTerms!: string;
 
   @ApiProperty()
+  itemDetails!: string;
+
+  @ApiProperty()
   documents?: string[];
 }
 

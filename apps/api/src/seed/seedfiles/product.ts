@@ -144,17 +144,28 @@ const ProductCategorySeed = {
         { productName: 'Apple MacBook Air', titles: ['Processor', 'RAM'], values: ['Apple M1 chip', '8GB'] },
         { productName: 'Sony Bravia XR A80J OLED TV', titles: ['Resolution', 'Smart TV'], values: ['4K Ultra HD', 'Google TV'] },
         { productName: 'Samsung Galaxy S21 Ultra', titles: ['Camera', 'Display'], values: ['108MP main sensor', '6.8-inch Dynamic AMOLED'] },
+        { productName: 'Bose QuietComfort 35 II Headphones', titles: ['Noise Cancellation', 'Battery Life'], values: ['Active Noise Cancelling', 'Up to 20 hours'] },
+        { productName: 'Nintendo Switch Console', titles: ['Screen', 'Storage'], values: ['6.2-inch touch screen', '32GB internal'] },
       ];
 
       await trx
         .insertInto('ProductSpecification')
-        .values(products.slice(0, 5).flatMap((product, index) => 
-          specifications[index]?.titles.map((title, i) => ({
+        .values(products.flatMap((product) => {
+          const spec = specifications.find(s => s.productName === product.name);
+          if (spec) {
+            return spec.titles.map((title, i) => ({
+              productId: product.id,
+              title,
+              value: spec.values[i] ?? ''
+            }));
+          }
+          // If no matching specification is found, add a default one
+          return [{
             productId: product.id,
-            title,
-            value: specifications[index]?.values[i] ?? ''
-          })) ?? []
-        ))
+            title: 'General',
+            value: 'Standard specification'
+          }];
+        }))
         .execute();
 
       // Insert product variants for some products

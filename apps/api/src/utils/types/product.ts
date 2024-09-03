@@ -1,10 +1,11 @@
 export interface ProductDetails {
-  id: string
+  id: string;
   name: string;
-  description: string
-  price: number
+  description: string;
+  price: number;
+  quantity: number;
   vendorName: string;
-  images: string [];
+  images: { imageUrl: string; isPrimary: boolean }[];
   specifications: { name: string; value: string }[];
-  variants: { id: string; name: string; price: number }[];
+  variants: { id: string; name: string; price: number, quantity: number }[];
 }

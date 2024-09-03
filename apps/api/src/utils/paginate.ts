@@ -23,16 +23,11 @@ export async function paginate<T>({
     .clearOrderBy()
     .select((qb) => qb.fn.count(identifier).as('count'));
 
-  console.log('Count query SQL:', countQuery.compile().sql);
-  console.log('Data query SQL:', dataQuery.compile().sql);
-
   const [data, totalResult] = await Promise.all([
     dataQuery.execute(),
     countQuery.executeTakeFirst(),
   ]);
 
-  console.log('Total result:', totalResult);
-  
   const total = totalResult ? parseInt(totalResult.count as string, 10) : 0;
   return {
     data,

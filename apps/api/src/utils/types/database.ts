@@ -49,6 +49,13 @@ export const ProcurementStatus = {
 } as const;
 export type ProcurementStatus =
   (typeof ProcurementStatus)[keyof typeof ProcurementStatus];
+export const ProcurementItemStatus = {
+  pending: 'pending',
+  accepted: 'accepted',
+  rejected: 'rejected',
+} as const;
+export type ProcurementItemStatus =
+  (typeof ProcurementItemStatus)[keyof typeof ProcurementItemStatus];
 export type CartItem = {
   id: Generated<string>;
   userId: string;
@@ -120,6 +127,7 @@ export type ProcurementItem = {
   quantity: number;
   unitPrice: string;
   totalPrice: string;
+  status: Generated<ProcurementItemStatus>;
   created_at: Generated<Timestamp>;
   updated_at: Timestamp | null;
 };

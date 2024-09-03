@@ -10,7 +10,7 @@ export class ProcurementService {
   constructor(
     private procurementRepo: ProcurementRepo,
     private cartRepository: CartRepository
-  ) {}
+  ) { }
 
   async createProcurement(
     payload: AddProcurementPayload & { userId: string; organizationId: string }
@@ -54,8 +54,9 @@ export class ProcurementService {
     };
   }
 
-  async getProcurement(id: string): Promise<IServiceHelper> {
-    const procurement = await this.procurementRepo.fetchProcurementById(id);
+  async getProcurement({ id, organizationId }
+    : { id: string; organizationId: string }): Promise<IServiceHelper> {
+    const procurement = await this.procurementRepo.fetchProcurementById({ id, organizationId });
     if (!procurement) {
       return {
         status: 'not-found',
@@ -69,3 +70,5 @@ export class ProcurementService {
     };
   }
 }
+
+

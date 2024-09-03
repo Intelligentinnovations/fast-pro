@@ -38,7 +38,7 @@ import { ProcurementService } from './procurement.service';
 @UseGuards(AuthGuard, PermissionsGuard)
 @Controller('procurement')
 export class ProcurementController {
-  constructor(private readonly procurementService: ProcurementService) {}
+  constructor(private readonly procurementService: ProcurementService) { }
 
   @Post('')
   // @RequiredPermission(Permission.CREATE_PRODUCT)
@@ -110,8 +110,10 @@ export class ProcurementController {
   @ApiParam({ name: 'id', required: true, description: 'Procurement ID' })
   @ApiOkResponse({ description: 'Procurement fetched successfully' })
   @ApiNotFoundResponse({ description: 'Procurement not found' })
-  async getProcurement(@Param('id') id: string) {
-    const product = await this.procurementService.getProcurement(id);
+  async getProcurement(@Param('id') id: string, @Req() req: FastifyRequest,
+  ) {
+    const organizationId = req.user?.organizationId as string;
+    const product = await this.procurementService.getProcurement({ id, organizationId });
     return convertAndSendResponse(product);
   }
 }
