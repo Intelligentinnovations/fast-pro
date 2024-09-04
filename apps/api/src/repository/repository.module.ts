@@ -1,15 +1,16 @@
 import { Global, Module } from '@nestjs/common';
 
+import { CartRepository } from './cart';
 import { InviteRepo } from './invite';
 import { OrganizationRepo } from './organization';
+import { ProcurementRepo } from './procurement';
+import { ProcurementItemRepo } from './procurementItems';
+import { ProductRepo } from './product';
 import { ProposalRepo } from './proposal';
 import { ProposalRequestRepo } from './proposalRequest';
+import { TaskRepo } from './task';
 import { UserRepo } from './user';
 import { VendorRepo } from './vendor';
-import { TaskRepo } from './task';
-import { ProductRepo } from './product';
-import { CartRepository } from './cart';
-import { ProcurementRepo } from './procurement';
 
 @Global()
 @Module({
@@ -24,6 +25,7 @@ import { ProcurementRepo } from './procurement';
     ProductRepo,
     CartRepository,
     ProcurementRepo,
+    ProcurementItemRepo
   ],
   exports: [
     InviteRepo,
@@ -36,6 +38,7 @@ import { ProcurementRepo } from './procurement';
     ProductRepo,
     CartRepository,
     ProcurementRepo,
+    ProcurementItemRepo
   ],
 })
 export class RepositoryModule {}

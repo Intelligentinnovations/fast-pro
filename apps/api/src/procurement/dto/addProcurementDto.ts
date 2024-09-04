@@ -1,6 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { string, z } from 'zod';
-
+import { Type } from 'class-transformer';
 
 export class AddProcurementDto {
   @ApiProperty()
@@ -19,13 +18,17 @@ export class AddProcurementDto {
   documents?: string[];
 }
 
+export class ApprovalItem {
+  @ApiProperty()
+  procurementItemId!: string;
 
-export const AddProcurementSchema = z.object({
-  requiredDate: z.string(),
-  itemDetails: z.string(),
-  justification: z.string(),
-  paymentTerms: z.string(),
-  documents: z.array(string()),
+  @ApiProperty()
+  isApproved!: boolean;
+}
 
-});
-export type AddProcurementPayload = z.infer<typeof AddProcurementSchema>;
+export class ApproveProcurementDto {
+  @ApiProperty({ type: [ApprovalItem], required: true })
+  @Type(() => ApprovalItem)
+  procurementItems!: ApprovalItem[];
+}
+

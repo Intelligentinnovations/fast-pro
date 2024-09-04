@@ -1,3 +1,5 @@
+import { ProcurementItemStatus } from "./database";
+
 export interface CartItems {
   id: string;
   productId: string;
@@ -10,3 +12,9 @@ export interface CartItems {
   imageUrl: string | null;
   vendorName: string;
 }
+
+
+export interface UpdateProcurementItem {
+  procurementItemId: string;
+  status: ProcurementItemStatus
+} 

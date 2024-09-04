@@ -25,11 +25,20 @@ import {
 import { FastifyRequest } from 'fastify';
 
 import { AuthGuard, PermissionsGuard } from '../libraries/guards';
-import { ProcurementFilters, ProcurementStatus, UserData } from '../utils';
 import {
-  AddProcurementDto,
+  ApproveProcurementSchema,
+  ProcurementFilters,
+  ProcurementStatus,
+  UserData,
+} from '../utils';
+import {
   AddProcurementPayload,
   AddProcurementSchema,
+  ApproveProcurementPayload,
+} from '../utils/schema/procurement';
+import {
+  AddProcurementDto,
+  ApproveProcurementDto,
 } from './dto/addProcurementDto';
 import { ProcurementService } from './procurement.service';
 
@@ -110,10 +119,31 @@ export class ProcurementController {
   @ApiParam({ name: 'id', required: true, description: 'Procurement ID' })
   @ApiOkResponse({ description: 'Procurement fetched successfully' })
   @ApiNotFoundResponse({ description: 'Procurement not found' })
-  async getProcurement(@Param('id') id: string, @Req() req: FastifyRequest,
-  ) {
+  async getProcurement(@Param('id') id: string, @Req() req: FastifyRequest) {
     const organizationId = req.user?.organizationId as string;
-    const product = await this.procurementService.getProcurement({ id, organizationId });
-    return convertAndSendResponse(product);
+    const data = await this.procurementService.getProcurement({
+      id,
+      organizationId,
+    });
+    return convertAndSendResponse(data);
+  }
+
+  @Post(':id/approve')
+  @ApiOperation({ summary: 'Approve procurement' })
+  @ApiBody({ type: ApproveProcurementDto })
+  @UsePipes(new ZodValidationPipe(ApproveProcurementSchema))
+  @ApiParam({ name: 'id', required: true, description: 'Procurement ID' })
+  @ApiOkResponse({ description: 'Procurement approved successfully' })
+  @ApiNotFoundResponse({ description: 'Procurement not found' })
+  async approveProcurement(
+    @Req() req: FastifyRequest,
+    @Body() payload: ApproveProcurementPayload,
+    @Param('id') id: string,
+  ) {
+    const data = await this.procurementService.approveProcurement({
+      id,
+      payload
+    });
+    return convertAndSendResponse(data);
   }
 }

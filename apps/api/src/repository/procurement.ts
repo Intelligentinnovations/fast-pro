@@ -1,9 +1,16 @@
 import { KyselyService } from '@backend-template/database';
 import { Injectable } from '@nestjs/common';
-import { sql } from 'kysely';
 
-import { AddProcurementPayload } from '../procurement/dto/addProcurementDto';
-import { CartItems, DB, paginate, ProcurementFilters } from '../utils';
+import {
+  ApproveProcurementPayload,
+  CartItems,
+  DB,
+  paginate,
+  ProcurementFilters,
+  ProcurementStatus,
+  UpdateProcurementItem,
+} from '../utils';
+import { AddProcurementPayload } from '../utils/schema/procurement';
 
 @Injectable()
 export class ProcurementRepo {
@@ -53,7 +60,14 @@ export class ProcurementRepo {
     let queryBuilder = this.client
       .selectFrom('Procurement')
       .innerJoin('User', 'Procurement.userId', 'User.id')
-      .select(['Procurement.id', 'User.firstname', 'User.lastname', 'itemDetails', 'amount', 'Procurement.status'])
+      .select([
+        'Procurement.id',
+        'User.firstname',
+        'User.lastname',
+        'itemDetails',
+        'amount',
+        'Procurement.status',
+      ])
       .where('User.organizationId', '=', organizationId);
     if (status) {
       queryBuilder = queryBuilder.where('Procurement.status', '=', status);
@@ -61,17 +75,28 @@ export class ProcurementRepo {
     if (sortBy === 'createdAt') {
       queryBuilder = queryBuilder.orderBy('Procurement.created_at', sortOrder);
     }
-    return paginate({ queryBuilder, pagination: query, identifier: 'Procurement.id' });
+    return paginate({
+      queryBuilder,
+      pagination: query,
+      identifier: 'Procurement.id',
+    });
   }
 
-  async fetchProcurementById({ id, organizationId }: { id: string; organizationId: string }) {
+  async fetchProcurementById({
+    id,
+    organizationId,
+  }: {
+    id: string;
+    organizationId: string;
+  }) {
     const procurementWithItems = await this.client
       .selectFrom('Procurement')
       .leftJoin(
         'ProcurementItem',
         'ProcurementItem.procurementId',
         'Procurement.id'
-      ).leftJoin('User', 'Procurement.userId', 'User.id')
+      )
+      .leftJoin('User', 'Procurement.userId', 'User.id')
       .leftJoin('Department', 'User.departmentId', 'Department.id')
       .select([
         'Procurement.id',
@@ -89,7 +114,7 @@ export class ProcurementRepo {
         'ProcurementItem.variantId',
         'ProcurementItem.quantity',
         'ProcurementItem.unitPrice',
-        'ProcurementItem.totalPrice'
+        'ProcurementItem.totalPrice',
       ])
       .where('Procurement.id', '=', id)
       .where('Procurement.organizationId', '=', organizationId)
@@ -108,17 +133,32 @@ export class ProcurementRepo {
       justification: procurementWithItems[0]?.justification,
       documents: procurementWithItems[0]?.documents,
       requiredDate: procurementWithItems[0]?.requiredDate,
-      procurementItems: procurementWithItems.map(item => ({
+      procurementItems: procurementWithItems.map((item) => ({
         id: item.itemId,
         productId: item.productId,
         variantId: item.variantId,
         quantity: item.quantity,
         unitPrice: item.unitPrice,
-        totalPrice: item.totalPrice
+        totalPrice: item.totalPrice,
       })),
-      total: procurementWithItems.reduce((sum, item) => sum + (Number(item.totalPrice) || 0), 0)
+      total: procurementWithItems.reduce(
+        (sum, item) => sum + (Number(item.totalPrice) || 0),
+        0
+      ),
     };
 
     return procurement;
+  }
+  async approveProcurement({ payload, procurementStatus }: { payload: UpdateProcurementItem[]; procurementStatus: ProcurementStatus }) {
+    await this.client.transaction().execute(async (trx) => {
+      for (const update of payload) {
+        await trx
+          .updateTable('ProcurementItem')
+          .set(update)
+          .where('id', '=', update.procurementItemId)
+          .execute()
+      }
+      await trx.updateTable('Procurement').set({ status: procurementStatus }).execute()
+    })
   }
 }

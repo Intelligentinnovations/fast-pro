@@ -1,15 +1,16 @@
 import { IServiceHelper } from '@backend-template/types';
 import { Injectable } from '@nestjs/common';
 
-import { CartRepository, ProcurementRepo } from '../repository';
-import { ProcurementFilters } from '../utils';
-import { AddProcurementPayload } from './dto/addProcurementDto';
+import { CartRepository, ProcurementItemRepo, ProcurementRepo } from '../repository';
+import { ApproveProcurementPayload, ProcurementFilters, ProcurementStatus, UpdateProcurementItem } from '../utils';
+import { AddProcurementPayload } from '../utils/schema/procurement';
 
 @Injectable()
 export class ProcurementService {
   constructor(
     private procurementRepo: ProcurementRepo,
-    private cartRepository: CartRepository
+    private cartRepository: CartRepository,
+    private procurementItem: ProcurementItemRepo
   ) { }
 
   async createProcurement(
@@ -54,9 +55,17 @@ export class ProcurementService {
     };
   }
 
-  async getProcurement({ id, organizationId }
-    : { id: string; organizationId: string }): Promise<IServiceHelper> {
-    const procurement = await this.procurementRepo.fetchProcurementById({ id, organizationId });
+  async getProcurement({
+    id,
+    organizationId,
+  }: {
+    id: string;
+    organizationId: string;
+  }): Promise<IServiceHelper> {
+    const procurement = await this.procurementRepo.fetchProcurementById({
+      id,
+      organizationId,
+    });
     if (!procurement) {
       return {
         status: 'not-found',
@@ -69,6 +78,32 @@ export class ProcurementService {
       data: procurement,
     };
   }
+  async approveProcurement(
+    { payload, id }: { payload: ApproveProcurementPayload; id: string }
+  ): Promise<IServiceHelper> {
+
+    const procurementItems = await this.procurementItem.fetchProcurementItems(id);
+
+    const data: UpdateProcurementItem[] = [];
+    for (const procurementItem of procurementItems) {
+      const approvedItem = payload.items.find(item => item.procurementItemId === procurementItem.id);
+      if (approvedItem) {
+        if (approvedItem.isAccepted) {
+          data.push({ procurementItemId: procurementItem.id, status: 'accepted' });
+        } else {
+          data.push({ procurementItemId: procurementItem.id, status: 'rejected' });
+        }
+      }
+    }
+    const unaccountedItems = payload.items.filter(item =>
+      !procurementItems.some(procItem => procItem.id === item.procurementItemId)
+    );
+    const procurementStatus: ProcurementStatus = unaccountedItems.length === procurementItems.length ? 'declined' : 'approved'
+
+    await this.procurementRepo.approveProcurement({ payload: data, procurementStatus });
+    return {
+      status: 'successful',
+      message: 'Procurement approved successfully',
+    };
+  }
 }
-
-

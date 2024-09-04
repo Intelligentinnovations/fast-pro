@@ -2,6 +2,7 @@ export { CartRepository } from './cart'
 export { InviteRepo } from './invite';
 export { OrganizationRepo } from './organization';
 export { ProcurementRepo } from './procurement'
+export { ProcurementItemRepo } from './procurementItems'
 export { ProductRepo } from './product';
 export { TaskRepo } from './task';
 export { UserRepo } from './user';
