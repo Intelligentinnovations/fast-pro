@@ -8,6 +8,7 @@ import { AuthModule } from './auth/auth.module';
 import { CartModule } from './cart/cart.module';
 import { InviteModule } from './invite/invite.module';
 import { LibrariesModule } from './libraries/libraries';
+import { ProcurementModule } from './procurement/procurement.module';
 import { ProductModule } from './product/product.module';
 import { ProfileModule } from './profile/profile.module';
 import { ProposalModule } from './proposal/proposal.module';
@@ -50,6 +51,7 @@ import { LoggingInterceptor } from './utils/loggerInterceptor';
     ProfileModule,
     ProductModule,
     CartModule,
+    ProcurementModule,
   ],
   providers: [
     {

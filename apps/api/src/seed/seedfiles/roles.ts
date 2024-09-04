@@ -37,6 +37,10 @@ const VIEW_TASK_PERMISSION_ID = randomUUID();
 const UPDATE_TASK_PERMISSION_ID = randomUUID();
 const DELETE_TASK_PERMISSION_ID = randomUUID();
 const DELETE_ACCOUNT_PERMISSION_ID = randomUUID();
+const CREATE_PROCUREMENT_ID = randomUUID();
+const UPDATE_PROCUREMENT_ID = randomUUID();
+const VIEW_PROCUREMENT_ID = randomUUID();
+const DELETE_PROCUREMENT_ID = randomUUID();
 
 const RolesSeed = {
   run: async () => {
@@ -192,6 +196,26 @@ const RolesSeed = {
           name: 'DELETE_ACCOUNT',
           description: 'Can deleted organization account',
         },
+        {
+          id: CREATE_PROCUREMENT_ID,
+          name: 'CREATE_PROCUREMENT',
+          description: 'Can create procurement',
+        },
+        {
+          id: UPDATE_PROCUREMENT_ID,
+          name: 'UPDATE_PROCUREMENT',
+          description: 'Can update procurement',
+        },
+        {
+          id: VIEW_PROCUREMENT_ID,
+          name: 'VIEW_PROCUREMENT',
+          description: 'Can view procurement',
+        },
+        {
+          id: DELETE_PROCUREMENT_ID,
+          name: 'DELETE_PROCUREMENT',
+          description: 'Can delete procurement',
+        },
       ])
       .execute();
 
@@ -271,6 +295,22 @@ const RolesSeed = {
           roleId: ADMIN_ROLE_ID,
           permissionId: DELETE_ACCOUNT_PERMISSION_ID,
         },
+        {
+          roleId: ADMIN_ROLE_ID,
+          permissionId: CREATE_PROCUREMENT_ID,
+        },
+        {
+          roleId: ADMIN_ROLE_ID,
+          permissionId: UPDATE_PROCUREMENT_ID,
+        },
+        {
+          roleId: ADMIN_ROLE_ID,
+          permissionId: VIEW_PROCUREMENT_ID,
+        },
+        {
+          roleId: ADMIN_ROLE_ID,
+          permissionId: DELETE_PROCUREMENT_ID,
+        },
 
         // requester role
         {
@@ -281,6 +321,14 @@ const RolesSeed = {
           roleId: REQUESTER_ROLE_ID,
           permissionId: VIEW_PRODUCT_PERMISSION_ID,
         },
+        {
+          roleId: REQUESTER_ROLE_ID,
+          permissionId: CREATE_PROCUREMENT_ID,
+        },
+        {
+          roleId: REQUESTER_ROLE_ID,
+          permissionId: VIEW_PROCUREMENT_ID,
+        },
 
         // approver role
         {
@@ -290,6 +338,14 @@ const RolesSeed = {
         {
           roleId: APPROVER_ROLE_ID,
           permissionId: VIEW_PRODUCT_PERMISSION_ID,
+        },
+        {
+          roleId: APPROVER_ROLE_ID,
+          permissionId: VIEW_PROCUREMENT_ID,
+        },
+        {
+          roleId: APPROVER_ROLE_ID,
+          permissionId: UPDATE_PROCUREMENT_ID,
         },
 
         // receiver role

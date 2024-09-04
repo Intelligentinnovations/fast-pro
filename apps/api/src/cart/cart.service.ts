@@ -1,12 +1,15 @@
 import { IServiceHelper } from '@backend-template/types';
 import { Injectable } from '@nestjs/common';
 
-import { CartRepository } from '../repository/cart';
+import { CartRepository, ProductRepo } from '../repository';
 import { AddProductToCartPayload } from './dto/addProductToCartDto';
 
 @Injectable()
 export class CartService {
-  constructor(private cartRepo: CartRepository) { }
+  constructor(
+    private cartRepo: CartRepository,
+    private product: ProductRepo
+  ) { }
 
   async addProductToCart({
     userId,
@@ -16,6 +19,31 @@ export class CartService {
     payload: AddProductToCartPayload;
   }): Promise<IServiceHelper> {
     const { productId, variantId, quantity } = payload;
+
+    const product = await this.product.fetchProductById(productId);
+    if (!product) {
+      return {
+        status: 'not-found',
+        message: 'Product not found'
+      };
+    }
+
+    if (product.variants.length > 0) {
+      const selectedVariant = product.variants.find(v => v.id === variantId);
+      if (!selectedVariant) {
+        return {
+          status: 'not-found',
+          message: 'Product variant not found'
+        };
+      }
+      if (quantity > selectedVariant.quantity) {
+        return {
+          status: 'bad-request',
+          message: 'Requested quantity exceeds available stock'
+        };
+      }
+    }
+
     const cartItem = await this.cartRepo.fetchCartItem({
       userId,
       productId,
@@ -45,7 +73,10 @@ export class CartService {
     };
   }
 
-  async removeCartItem(ids: { userId: string; id: string }): Promise<IServiceHelper> {
+  async removeCartItem(ids: {
+    userId: string;
+    id: string;
+  }): Promise<IServiceHelper> {
     await this.cartRepo.deleteCartItem(ids);
     return {
       status: 'deleted',

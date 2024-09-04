@@ -5,6 +5,7 @@ import {
   AddProductPayload,
   DB,
   paginate,
+  Product,
   ProductDetails,
   ProductFilters,
   UserData,
@@ -45,12 +46,12 @@ export class ProductRepo {
       const baseProduct = await trx
         .insertInto('Product')
         .values({
+          basePrice: (hasVariant
+            ? smallestPrice
+            : baseProductDetails.price) as string,
           ...baseProductDetailsWithoutPrice,
-          quantity: hasVariant ? totalQuantity : baseProductDetails.quantity,
           vendorId,
-          basePrice: hasVariant
-            ? smallestPrice.toString()
-            : baseProductDetails.price,
+          quantity: hasVariant ? totalQuantity : baseProductDetails.quantity,
         })
         .returning([
           'id',
@@ -62,6 +63,7 @@ export class ProductRepo {
           'categoryId',
         ])
         .executeTakeFirst();
+
       const productId = baseProduct?.id as string;
       const productImagesWithProductId =
         images?.map((image) => ({
@@ -117,28 +119,24 @@ export class ProductRepo {
     searchQuery: ProductFilters;
     user: UserData;
   }) {
-    let query = this.client
+    let baseQuery = this.client
       .selectFrom('Product')
       .innerJoin('Vendor', 'Vendor.id', 'Product.vendorId')
-      .leftJoin('ProductImage', 'ProductImage.productId', 'Product.id')
-      .where('ProductImage.isPrimary', '=', true)
-      .select([
-        'Product.id',
-        'Product.name',
-        'Product.description',
-        'Product.basePrice as price',
-        'Vendor.name as vendorName',
-        'ProductImage.imageUrl as primaryImageUrl',
-      ]);
+      .leftJoin('ProductImage', (join) =>
+        join
+          .onRef('ProductImage.productId', '=', 'Product.id')
+          .on('ProductImage.isPrimary', '=', true)
+      );
+
     if (user.vendorId) {
-      query = query.where('Product.vendorId', '=', user.vendorId);
+      baseQuery = baseQuery.where('Product.vendorId', '=', user.vendorId);
     }
 
     if (
       searchQuery.productCategoryNames &&
       searchQuery.productCategoryNames.length > 0
     ) {
-      query = query
+      baseQuery = baseQuery
         .innerJoin(
           'ProductCategory',
           'ProductCategory.id',
@@ -148,82 +146,111 @@ export class ProductRepo {
     }
 
     if (searchQuery.minPrice) {
-      query = query.where('Product.basePrice', '>=', searchQuery.minPrice);
+      baseQuery = baseQuery.where(
+        'Product.basePrice',
+        '>=',
+        searchQuery.minPrice
+      );
     }
     if (searchQuery.maxPrice) {
-      query = query.where('Product.basePrice', '<=', searchQuery.maxPrice);
-    }
-    if (searchQuery.sortBy === 'price') {
-      query = query.orderBy('Product.basePrice', searchQuery.sortOrder);
+      baseQuery = baseQuery.where(
+        'Product.basePrice',
+        '<=',
+        searchQuery.maxPrice
+      );
     }
 
-    query = query.groupBy([
+    let dataQuery = baseQuery.select([
       'Product.id',
       'Product.name',
       'Product.description',
-      'Product.basePrice',
-      'Vendor.name',
-      'ProductImage.imageUrl',
+      'Product.basePrice as price',
+      'Vendor.name as vendorName',
+      'ProductImage.imageUrl as primaryImageUrl',
     ]);
 
-    return paginate({
-      queryBuilder: query,
+    if (searchQuery.sortBy === 'price') {
+      dataQuery = dataQuery.orderBy('Product.basePrice', searchQuery.sortOrder);
+    }
+
+    return paginate<Product>({
+      queryBuilder: dataQuery,
       pagination: searchQuery,
       identifier: 'Product.id',
     });
   }
-  async fetchProductById(id: string) {
-    const results = await this.client.selectFrom('Product')
+  async fetchProductById(id: string): Promise<ProductDetails | undefined> {
+    const results = await this.client
+      .selectFrom('Product')
       .innerJoin('Vendor', 'Vendor.id', 'Product.vendorId')
       .leftJoin('ProductImage', 'ProductImage.productId', 'Product.id')
-      .leftJoin('ProductSpecification', 'ProductSpecification.productId', 'Product.id')
+      .leftJoin(
+        'ProductSpecification',
+        'ProductSpecification.productId',
+        'Product.id'
+      )
       .leftJoin('ProductVariant', 'ProductVariant.productId', 'Product.id')
       .select([
         'Product.id',
         'Product.name',
         'Product.description',
+        'Product.quantity',
         'Product.basePrice as price',
         'Vendor.name as vendorName',
         'ProductImage.imageUrl',
+        'ProductImage.isPrimary',
         'ProductSpecification.title as spec',
         'ProductSpecification.value as specValue',
         'ProductVariant.id as variantId',
         'ProductVariant.name as variantName',
         'ProductVariant.price as variantPrice',
+        'ProductVariant.quantity as variantQuantity',
       ])
       .where('Product.id', '=', id)
-      .execute()
+      .execute();
 
-      if (results.length === 0) return {};
-      const product: ProductDetails = {
-        id: results[0]?.id as string,
-        name: results[0]?.name ?? '',
-        description: results[0]?.description ?? '',
-        price: results[0]?.price ? Number(results[0].price) : 0,
-        vendorName: results[0]?.vendorName ?? '',
-        images: [],
-        specifications: [],
-        variants: [],
-      };
-      for (const row of results) {
-        if (row.imageUrl && !product.images.includes(row.imageUrl)) {
-          product.images.push(row.imageUrl);
-        }
-        if (row.spec && row.specValue && !product.specifications.some(s => s.name === row.spec)) {
-          product.specifications.push({ name: row.spec, value: row.specValue });
-        }
-        if (row.variantId) {
-          const variant = {
-            id: row.variantId as string,
-            name: row.variantName as string,
-            price: Number(row.variantPrice),
-          };
-          if (!product.variants.some(v => v.id === variant.id)) {
-            product.variants.push(variant);
-          }
+    if (results.length === 0) return undefined;
+    const product: ProductDetails = {
+      id: results[0]?.id as string,
+      name: results[0]?.name ?? '',
+      description: results[0]?.description ?? '',
+      price: results[0]?.price ? Number(results[0].price) : 0,
+      quantity: results[0]?.quantity ? Number(results[0].quantity) : 0,
+      vendorName: results[0]?.vendorName ?? '',
+      images: [],
+      specifications: [],
+      variants: [],
+    };
+    for (const row of results) {
+      if (
+        row.imageUrl &&
+        !product.images.some((value) => value.imageUrl === row.imageUrl)
+      ) {
+        product.images.push({
+          imageUrl: row.imageUrl,
+          isPrimary: row.isPrimary ?? false,
+        });
+      }
+      if (
+        row.spec &&
+        row.specValue &&
+        !product.specifications.some((s) => s.name === row.spec)
+      ) {
+        product.specifications.push({ name: row.spec, value: row.specValue });
+      }
+      if (row.variantId) {
+        const variant = {
+          id: row.variantId as string,
+          name: row.variantName as string,
+          price: Number(row.variantPrice),
+          quantity: Number(row.variantQuantity),
+        };
+        if (!product.variants.some((v) => v.id === variant.id)) {
+          product.variants.push(variant);
         }
       }
+    }
 
-      return product;
+    return product;
   }
 }
