@@ -256,7 +256,7 @@ model Procurement {
   organizationId String
   itemDetails    String
   amount         Decimal           @db.Decimal(10, 2)
-  status         ProcurementStatus @default(created)
+  status         ProcurementStatus @default(pending)
   requiredDate   DateTime
   justification  String
   paymentTerms   String
@@ -272,7 +272,7 @@ model ProcurementItem {
   id            String                @id @default(dbgenerated("gen_random_uuid()"))
   procurementId String
   productId     String
-  comment       String
+  comment       String?
   variantId     String?
   quantity      Int
   unitPrice     Decimal               @db.Decimal(10, 2)

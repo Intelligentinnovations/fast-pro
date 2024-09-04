@@ -24,18 +24,21 @@ import {
 } from '@nestjs/swagger';
 import { FastifyRequest } from 'fastify';
 
-import { AuthGuard, PermissionsGuard } from '../libraries/guards';
 import {
-  ApproveProcurementSchema,
-  ProcurementFilters,
-  ProcurementStatus,
-  UserData,
-} from '../utils';
+  AuthGuard,
+  PermissionsGuard,
+  RequiredPermission,
+} from '../libraries/guards';
 import {
   AddProcurementPayload,
   AddProcurementSchema,
   ApproveProcurementPayload,
-} from '../utils/schema/procurement';
+  ApproveProcurementSchema,
+  Permission,
+  ProcurementFilters,
+  ProcurementStatus,
+  UserData,
+} from '../utils';
 import {
   AddProcurementDto,
   ApproveProcurementDto,
@@ -47,10 +50,10 @@ import { ProcurementService } from './procurement.service';
 @UseGuards(AuthGuard, PermissionsGuard)
 @Controller('procurement')
 export class ProcurementController {
-  constructor(private readonly procurementService: ProcurementService) { }
+  constructor(private readonly procurementService: ProcurementService) {}
 
   @Post('')
-  // @RequiredPermission(Permission.CREATE_PRODUCT)
+  @RequiredPermission(Permission.CREATE_PROCUREMENT)
   @ApiOperation({ summary: 'Create procurement' })
   @UsePipes(new ZodValidationPipe(AddProcurementSchema))
   @ApiBody({ type: AddProcurementDto })
@@ -72,6 +75,7 @@ export class ProcurementController {
   }
 
   @Get('')
+  @RequiredPermission(Permission.VIEW_PROCUREMENT)
   @ApiQuery({
     name: 'page',
     required: false,
@@ -115,6 +119,7 @@ export class ProcurementController {
   }
 
   @Get(':id')
+  @RequiredPermission(Permission.VIEW_PROCUREMENT)
   @ApiOperation({ summary: 'Get procurement by ID' })
   @ApiParam({ name: 'id', required: true, description: 'Procurement ID' })
   @ApiOkResponse({ description: 'Procurement fetched successfully' })
@@ -129,20 +134,23 @@ export class ProcurementController {
   }
 
   @Post(':id/approve')
+  @RequiredPermission(Permission.UPDATE_PROCUREMENT)
   @ApiOperation({ summary: 'Approve procurement' })
   @ApiBody({ type: ApproveProcurementDto })
-  @UsePipes(new ZodValidationPipe(ApproveProcurementSchema))
   @ApiParam({ name: 'id', required: true, description: 'Procurement ID' })
   @ApiOkResponse({ description: 'Procurement approved successfully' })
   @ApiNotFoundResponse({ description: 'Procurement not found' })
   async approveProcurement(
     @Req() req: FastifyRequest,
-    @Body() payload: ApproveProcurementPayload,
-    @Param('id') id: string,
+    @Body(new ZodValidationPipe(ApproveProcurementSchema))
+    payload: ApproveProcurementPayload,
+    @Param('id') id: string
   ) {
+    const organizationId = req.user?.organizationId as string;
     const data = await this.procurementService.approveProcurement({
       id,
-      payload
+      organizationId,
+      payload,
     });
     return convertAndSendResponse(data);
   }

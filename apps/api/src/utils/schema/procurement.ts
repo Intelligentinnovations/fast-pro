@@ -12,11 +12,13 @@ export type AddProcurementPayload = z.infer<typeof AddProcurementSchema>;
 const ProcurementApprovalSchema = z.object({
   procurementItemId: z.string(),
   isAccepted: z.boolean(),
+  comment: z.string().optional(),
 });
 
 export const ApproveProcurementSchema = z.object({
-  items: z.array(ProcurementApprovalSchema),
+  items: z.array(ProcurementApprovalSchema)
 });
+
 export type ApproveProcurementPayload = z.infer<
   typeof ApproveProcurementSchema
 >;

@@ -123,6 +123,7 @@ export type ProcurementItem = {
   id: Generated<string>;
   procurementId: string;
   productId: string;
+  comment: string | null;
   variantId: string | null;
   quantity: number;
   unitPrice: string;

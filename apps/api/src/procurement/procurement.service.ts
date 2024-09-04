@@ -1,9 +1,18 @@
 import { IServiceHelper } from '@backend-template/types';
 import { Injectable } from '@nestjs/common';
 
-import { CartRepository, ProcurementItemRepo, ProcurementRepo } from '../repository';
-import { ApproveProcurementPayload, ProcurementFilters, ProcurementStatus, UpdateProcurementItem } from '../utils';
-import { AddProcurementPayload } from '../utils/schema/procurement';
+import {
+  CartRepository,
+  ProcurementItemRepo,
+  ProcurementRepo,
+} from '../repository';
+import {
+  AddProcurementPayload,
+  ApproveProcurementPayload,
+  ProcurementFilters,
+  ProcurementStatus,
+  UpdateProcurementItem,
+} from '../utils';
 
 @Injectable()
 export class ProcurementService {
@@ -11,7 +20,7 @@ export class ProcurementService {
     private procurementRepo: ProcurementRepo,
     private cartRepository: CartRepository,
     private procurementItem: ProcurementItemRepo
-  ) { }
+  ) {}
 
   async createProcurement(
     payload: AddProcurementPayload & { userId: string; organizationId: string }
@@ -78,29 +87,67 @@ export class ProcurementService {
       data: procurement,
     };
   }
-  async approveProcurement(
-    { payload, id }: { payload: ApproveProcurementPayload; id: string }
-  ): Promise<IServiceHelper> {
+  async approveProcurement({
+    payload,
+    id,
+    organizationId,
+  }: {
+    organizationId: string;
+    payload: ApproveProcurementPayload;
+    id: string;
+  }): Promise<IServiceHelper> {
+    const procurementItems = await this.procurementItem.fetchProcurementItems({
+      organizationId,
+      procurementId: id,
+    });
+    if (procurementItems[0]?.ProcurementStatus !== 'pending')
+      return {
+        status: 'bad-request',
+        message: 'Procurement has either been approved or declined ',
+      };
+    const unaccountedItems = procurementItems.filter(
+      (item) =>
+        !payload.items.some(
+          (payloadItem) =>
+            payloadItem.procurementItemId === item.procurementItemId
+        )
+    );
 
-    const procurementItems = await this.procurementItem.fetchProcurementItems(id);
-
+    if (unaccountedItems.length > 0)
+      return {
+        status: 'bad-request',
+        message: 'Some items are left approved/rejected',
+      };
     const data: UpdateProcurementItem[] = [];
     for (const procurementItem of procurementItems) {
-      const approvedItem = payload.items.find(item => item.procurementItemId === procurementItem.id);
+      const approvedItem = payload.items.find(
+        (item) => item.procurementItemId === procurementItem.procurementItemId
+      );
       if (approvedItem) {
         if (approvedItem.isAccepted) {
-          data.push({ procurementItemId: procurementItem.id, status: 'accepted' });
+          data.push({
+            id: procurementItem.procurementItemId,
+            status: 'accepted',
+            comment: approvedItem.comment,
+          });
         } else {
-          data.push({ procurementItemId: procurementItem.id, status: 'rejected' });
+          data.push({
+            id: procurementItem.procurementItemId,
+            status: 'rejected',
+            comment: approvedItem.comment,
+          });
         }
       }
     }
-    const unaccountedItems = payload.items.filter(item =>
-      !procurementItems.some(procItem => procItem.id === item.procurementItemId)
-    );
-    const procurementStatus: ProcurementStatus = unaccountedItems.length === procurementItems.length ? 'declined' : 'approved'
+    const allItemsRejected = data.every((item) => item.status === 'rejected');
+    const procurementStatus: ProcurementStatus = allItemsRejected
+      ? 'declined'
+      : 'approved';
 
-    await this.procurementRepo.approveProcurement({ payload: data, procurementStatus });
+    await this.procurementRepo.approveProcurement({
+      payload: data,
+      procurementStatus,
+    });
     return {
       status: 'successful',
       message: 'Procurement approved successfully',

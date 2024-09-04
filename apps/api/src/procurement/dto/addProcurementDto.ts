@@ -24,11 +24,14 @@ export class ApprovalItem {
 
   @ApiProperty()
   isApproved!: boolean;
+
+  @ApiProperty()
+  comment!: string;
 }
 
 export class ApproveProcurementDto {
   @ApiProperty({ type: [ApprovalItem], required: true })
   @Type(() => ApprovalItem)
-  procurementItems!: ApprovalItem[];
+  items!: ApprovalItem[];
 }
 

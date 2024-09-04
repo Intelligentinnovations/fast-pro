@@ -2,7 +2,7 @@ import { KyselyService } from '@backend-template/database';
 import { Injectable } from '@nestjs/common';
 
 import {
-  ApproveProcurementPayload,
+  AddProcurementPayload,
   CartItems,
   DB,
   paginate,
@@ -10,11 +10,10 @@ import {
   ProcurementStatus,
   UpdateProcurementItem,
 } from '../utils';
-import { AddProcurementPayload } from '../utils/schema/procurement';
 
 @Injectable()
 export class ProcurementRepo {
-  constructor(private client: KyselyService<DB>) { }
+  constructor(private client: KyselyService<DB>) {}
 
   async createProcurement(
     procurementPayload: AddProcurementPayload & {
@@ -123,7 +122,7 @@ export class ProcurementRepo {
     if (procurementWithItems.length === 0) {
       return null;
     }
-    const procurement = {
+    return {
       id: procurementWithItems[0]?.id,
       department: procurementWithItems[0]?.department,
       requestedBy: `${procurementWithItems[0]?.firstname} ${procurementWithItems[0]?.lastname}`,
@@ -146,19 +145,31 @@ export class ProcurementRepo {
         0
       ),
     };
-
-    return procurement;
   }
-  async approveProcurement({ payload, procurementStatus }: { payload: UpdateProcurementItem[]; procurementStatus: ProcurementStatus }) {
+  async approveProcurement({
+    payload,
+    procurementStatus,
+  }: {
+    payload: UpdateProcurementItem[];
+    procurementStatus: ProcurementStatus;
+  }) {
     await this.client.transaction().execute(async (trx) => {
       for (const update of payload) {
+        console.log({ update });
         await trx
           .updateTable('ProcurementItem')
-          .set(update)
-          .where('id', '=', update.procurementItemId)
-          .execute()
+          .set({
+            status: update.status,
+            comment: update.comment,
+            updated_at: new Date(),
+          })
+          .where('id', '=', update.id)
+          .execute();
       }
-      await trx.updateTable('Procurement').set({ status: procurementStatus }).execute()
-    })
+      await trx
+        .updateTable('Procurement')
+        .set({ status: procurementStatus })
+        .execute();
+    });
   }
 }
