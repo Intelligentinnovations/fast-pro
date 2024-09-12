@@ -3,6 +3,7 @@ import { Injectable } from '@nestjs/common';
 
 import {
   CartRepository,
+  OrderRepository,
   ProcurementItemRepo,
   ProcurementRepo,
 } from '../repository';
@@ -19,7 +20,8 @@ export class ProcurementService {
   constructor(
     private procurementRepo: ProcurementRepo,
     private cartRepository: CartRepository,
-    private procurementItem: ProcurementItemRepo
+    private procurementItem: ProcurementItemRepo,
+    private orderRepository: OrderRepository
   ) {}
 
   async createProcurement(
@@ -96,16 +98,21 @@ export class ProcurementService {
     payload: ApproveProcurementPayload;
     id: string;
   }): Promise<IServiceHelper> {
-    const procurementItems = await this.procurementItem.fetchProcurementItems({
+    const procurement = await this.procurementItem.fetchProcurementWithItems({
       organizationId,
       procurementId: id,
     });
-    if (procurementItems[0]?.ProcurementStatus !== 'pending')
+    if (!procurement)
+      return {
+        status: 'not-found',
+        message: 'No procurement with the given id was found',
+      };
+    if (procurement && procurement.procurementStatus !== 'pending')
       return {
         status: 'bad-request',
         message: 'Procurement has either been approved or declined ',
       };
-    const unaccountedItems = procurementItems.filter(
+    const unaccountedItems = procurement?.procurementItems.filter(
       (item) =>
         !payload.items.some(
           (payloadItem) =>
@@ -113,41 +120,94 @@ export class ProcurementService {
         )
     );
 
-    if (unaccountedItems.length > 0)
+    if (unaccountedItems && unaccountedItems.length > 0) {
       return {
         status: 'bad-request',
         message: 'Some items are left approved/rejected',
       };
+    }
     const data: UpdateProcurementItem[] = [];
-    for (const procurementItem of procurementItems) {
-      const approvedItem = payload.items.find(
-        (item) => item.procurementItemId === procurementItem.procurementItemId
-      );
-      if (approvedItem) {
-        if (approvedItem.isAccepted) {
-          data.push({
-            id: procurementItem.procurementItemId,
-            status: 'accepted',
-            comment: approvedItem.comment,
-          });
-        } else {
-          data.push({
-            id: procurementItem.procurementItemId,
-            status: 'rejected',
-            comment: approvedItem.comment,
-          });
+    if (procurement) {
+      for (const procurementItem of procurement.procurementItems) {
+        const approvedItem = payload.items.find(
+          (item) => item.procurementItemId === procurementItem.procurementItemId
+        );
+        if (approvedItem) {
+          if (approvedItem.isAccepted) {
+            data.push({
+              id: procurementItem.procurementItemId,
+              status: 'accepted',
+              comment: approvedItem.comment,
+            });
+          } else {
+            data.push({
+              id: procurementItem.procurementItemId,
+              status: 'rejected',
+              comment: approvedItem.comment,
+            });
+          }
         }
       }
-    }
-    const allItemsRejected = data.every((item) => item.status === 'rejected');
-    const procurementStatus: ProcurementStatus = allItemsRejected
-      ? 'declined'
-      : 'approved';
+      const allItemsRejected = data.every((item) => item.status === 'rejected');
 
-    await this.procurementRepo.approveProcurement({
-      payload: data,
-      procurementStatus,
-    });
+      const procurementStatus: ProcurementStatus = allItemsRejected
+        ? 'declined'
+        : 'approved';
+
+      await this.procurementRepo.approveProcurement({
+        payload: data,
+        procurementStatus,
+      });
+
+      const acceptedItems = data.filter((item) => item.status === 'accepted');
+      const acceptedProcurementItems = procurement.procurementItems.filter(
+        (item) =>
+          acceptedItems.some(
+            (acceptedItem) => acceptedItem.id === item.procurementItemId
+          )
+      );
+
+      const groupedByVendor = acceptedProcurementItems.reduce((acc, item) => {
+        if (!acc[item.vendorId]) {
+          acc[item.vendorId] = [];
+        }
+        acc[item.vendorId]?.push(item);
+        return acc;
+      }, {} as Record<string, typeof acceptedProcurementItems>);
+
+      for (const [vendorId, items] of Object.entries(groupedByVendor)) {
+        if (items.length === 0) continue;
+
+        const vendorName = items[0]?.vendorName;
+        if (!vendorName) continue;
+        const totalAmount = items.reduce((sum, item) => {
+          const itemTotal =
+            Number(item.quantity ?? 0) * Number(item.unitPrice ?? 0);
+          return sum + itemTotal;
+        }, 0);
+
+        await this.orderRepository.create({
+          organizationId,
+          amount: totalAmount.toString(),
+          procurementId: procurement.procurementId ?? '',
+          requestedBy: procurement.requestedBy,
+          vendorId,
+          organizationName: '',
+          itemDetails: procurement.itemDetails ?? '',
+          requiredDate: procurement.requiredDate ?? new Date(),
+          orderItems: items.map((item) => ({
+            productId: item.productId,
+            variantId: item.variantId,
+            productName: item.productName,
+            quantity: item.quantity,
+            unitPrice: item.unitPrice,
+            totalPrice: (
+              Number(item.quantity) * Number(item.unitPrice)
+            ).toString(),
+          })),
+        });
+      }
+    }
     return {
       status: 'successful',
       message: 'Procurement approved successfully',

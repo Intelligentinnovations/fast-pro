@@ -1,4 +1,4 @@
-import { ProcurementStatus } from './database';
+import { OrderStatus, ProcurementStatus } from './database';
 
 export interface PaginationResult<T> {
   data: T[];
@@ -23,4 +23,8 @@ export interface ProductFilters extends QueryParams {
 
 export interface ProcurementFilters extends QueryParams {
   status?: ProcurementStatus;
+}
+
+export interface OrderFilters extends QueryParams {
+  status?: OrderStatus;
 }

@@ -1,4 +1,4 @@
-import { ProcurementItemStatus } from './database';
+import { ItemStatus } from './database';
 
 export interface CartItems {
   id: string;
@@ -15,6 +15,6 @@ export interface CartItems {
 
 export interface UpdateProcurementItem {
   id: string;
-  status: ProcurementItemStatus;
+  status: ItemStatus;
   comment?: string;
 }

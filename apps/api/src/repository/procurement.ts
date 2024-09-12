@@ -155,7 +155,6 @@ export class ProcurementRepo {
   }) {
     await this.client.transaction().execute(async (trx) => {
       for (const update of payload) {
-        console.log({ update });
         await trx
           .updateTable('ProcurementItem')
           .set({
