@@ -277,6 +277,9 @@ model ProcurementItem {
   id            String          @id @default(dbgenerated("gen_random_uuid()"))
   procurementId String
   productId     String
+  productName   String
+  vendorName    String
+  productImage  String
   comment       String?
   variantId     String?
   quantity      Int
@@ -311,15 +314,17 @@ model Order {
 }
 
 model OrderItem {
-  id          String     @id @default(dbgenerated("gen_random_uuid()"))
-  orderId     String
-  productId   String
-  variantId   String?
-  productName String
-  quantity    Int
-  unitPrice   Decimal    @db.Decimal(10, 2)
-  totalPrice  Decimal    @db.Decimal(10, 2)
-  status      ItemStatus @default(pending)
+  id           String     @id @default(dbgenerated("gen_random_uuid()"))
+  orderId      String
+  productId    String
+  variantId    String?
+  productName  String
+  vendorName   String
+  productImage String
+  quantity     Int
+  unitPrice    Decimal    @db.Decimal(10, 2)
+  totalPrice   Decimal    @db.Decimal(10, 2)
+  status       ItemStatus @default(pending)
 
   Product Product         @relation(fields: [productId], references: [id])
   Variant ProductVariant? @relation(fields: [variantId], references: [id])

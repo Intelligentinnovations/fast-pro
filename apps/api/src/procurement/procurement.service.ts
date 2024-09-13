@@ -36,9 +36,15 @@ export class ProcurementService {
         status: 'not-found',
         message: 'Please add items to cart to continue',
       };
+      
+    const formattedItems = items.map(item => ({
+      ...item,
+      productImage: item.productImage || '',
+    }));
+
     await this.procurementRepo.createProcurement(
       { ...payload, userId, organizationId, amount: subTotal.toString() },
-      items
+      formattedItems
     );
     await this.cartRepository.clearCartItems(userId);
 
@@ -192,13 +198,15 @@ export class ProcurementService {
           procurementId: procurement.procurementId ?? '',
           requestedBy: procurement.requestedBy,
           vendorId,
-          organizationName: '',
+          organizationName: procurement.organizationName ?? '',
           itemDetails: procurement.itemDetails ?? '',
           requiredDate: procurement.requiredDate ?? new Date(),
           orderItems: items.map((item) => ({
             productId: item.productId,
             variantId: item.variantId,
             productName: item.productName,
+            productImage: item.productImage,
+            vendorName: item.vendorName,
             quantity: item.quantity,
             unitPrice: item.unitPrice,
             totalPrice: (

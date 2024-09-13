@@ -24,6 +24,7 @@ export class ProcurementItemRepo {
       .innerJoin('Product', 'ProcurementItem.productId', 'Product.id')
       .innerJoin('Vendor', 'Product.vendorId', 'Vendor.id')
       .innerJoin('User', 'Procurement.userId', 'User.id')
+      .innerJoin('Organization', 'User.organizationId', 'User.id')
       .select([
         'Procurement.id as procurementId',
         'Procurement.itemDetails',
@@ -33,13 +34,15 @@ export class ProcurementItemRepo {
         'Procurement.amount as procurementAmount',
         'User.firstname',
         'User.lastname',
+        'Organization.name as organizationName',
         'ProcurementItem.id as procurementItemId',
         'ProcurementItem.status as procurementItemStatus',
         'ProcurementItem.productId',
         'ProcurementItem.variantId',
         'ProcurementItem.quantity',
         'ProcurementItem.unitPrice',
-        'Product.name as productName',
+        'ProcurementItem.productName',
+        'ProcurementItem.productImage',
         'Vendor.id as vendorId',
         'Vendor.name as vendorName',
       ])
@@ -57,6 +60,7 @@ export class ProcurementItemRepo {
       paymentTerms: result[0]?.paymentTerms,
       procurementStatus: result[0]?.procurementStatus,
       procurementAmount: result[0]?.procurementAmount,
+      organizationName: result[0]?.organizationName,
       requestedBy: `${result[0]?.firstname} ${result[0]?.lastname}`,
       procurementItems: result.map((item) => ({
         procurementItemId: item.procurementItemId,
@@ -64,6 +68,7 @@ export class ProcurementItemRepo {
         productId: item.productId,
         variantId: item.variantId,
         productName: item.productName,
+        productImage: item.productImage,
         quantity: item.quantity,
         unitPrice: item.unitPrice,
         vendorId: item.vendorId,

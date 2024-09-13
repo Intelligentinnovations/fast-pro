@@ -22,4 +22,16 @@ export class OrderService {
       data: cartItems,
     };
   }
+
+  async fetchOrder(param: {
+    orderId: string;
+    user: UserData;
+  }): Promise<IServiceHelper> {
+    const order = await this.orderRepo.fetchOrderDetails(param);
+    return {
+      status: 'successful',
+      message: 'Order fetched successfully',
+      data: order,
+    };
+  }
 }

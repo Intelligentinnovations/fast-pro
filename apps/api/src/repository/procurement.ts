@@ -32,11 +32,23 @@ export class ProcurementRepo {
         .executeTakeFirst();
 
       const procurementItems = cartItems.map(
-        ({ productId, variantId, quantity, price, total }) => ({
+        ({
+          productId,
+          variantId,
+          quantity,
+          price,
+          total,
+          productImage,
+          vendorName,
+          productName,
+        }) => ({
           procurementId: procurement?.id as string,
           productId,
           variantId,
           quantity,
+          productImage,
+          vendorName,
+          productName,
           unitPrice: price.toString(),
           totalPrice: total.toString(),
         })

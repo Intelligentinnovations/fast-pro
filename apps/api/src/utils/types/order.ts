@@ -2,6 +2,8 @@ interface IOrder {
   productId: string;
   variantId?: string | null;
   productName: string;
+  productImage: string;
+  vendorName: string;
   quantity: number;
   unitPrice: string;
   totalPrice: string;

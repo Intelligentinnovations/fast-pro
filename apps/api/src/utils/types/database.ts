@@ -111,6 +111,8 @@ export type OrderItem = {
   productId: string;
   variantId: string | null;
   productName: string;
+  vendorName: string;
+  productImage: string;
   quantity: number;
   unitPrice: string;
   totalPrice: string;
@@ -159,6 +161,9 @@ export type ProcurementItem = {
   id: Generated<string>;
   procurementId: string;
   productId: string;
+  productName: string;
+  vendorName: string;
+  productImage: string;
   comment: string | null;
   variantId: string | null;
   quantity: number;

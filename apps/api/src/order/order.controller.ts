@@ -1,5 +1,5 @@
 import { convertAndSendResponse } from '@backend-template/helpers';
-import { Controller, Get, Query, Req, UseGuards } from '@nestjs/common';
+import { Controller, Get, Param, Query, Req, UseGuards } from '@nestjs/common';
 import {
   ApiBearerAuth,
   ApiOkResponse,
@@ -10,7 +10,7 @@ import {
 import { FastifyRequest } from 'fastify';
 
 import { AuthGuard, PermissionsGuard } from '../libraries/guards';
-import { OrderStatus, ProductFilters, UserData } from '../utils';
+import { OrderFilters, OrderStatus, UserData } from '../utils';
 import { OrderService } from './order.service';
 
 @ApiTags('Order')
@@ -21,6 +21,7 @@ export class OrderController {
   constructor(private readonly orderService: OrderService) {}
 
   @Get('')
+  // @RequiredPermission(Permission.VIEW_ORDER)
   @ApiQuery({
     name: 'page',
     required: false,
@@ -61,12 +62,22 @@ export class OrderController {
   })
   @ApiOperation({ summary: 'Get orders' })
   @ApiOkResponse({ description: 'Orders fetched successfully' })
-  async fetchCart(
+  async fetchOrders(
     @Req() req: FastifyRequest,
-    @Query() searchQuery: ProductFilters
+    @Query() searchQuery: OrderFilters
   ) {
     const user = req.user as UserData;
     const data = await this.orderService.fetchOrders({ user, searchQuery });
+    return convertAndSendResponse(data);
+  }
+
+  @Get(':id')
+  // @RequiredPermission(Permission.VIEW_ORDER)
+  @ApiOperation({ summary: 'Get order details' })
+  @ApiOkResponse({ description: 'Order details fetched successfully' })
+  async fetchOrder(@Req() req: FastifyRequest, @Param('id') orderId: string) {
+    const user = req.user as UserData;
+    const data = await this.orderService.fetchOrder({ user, orderId });
     return convertAndSendResponse(data);
   }
 }
