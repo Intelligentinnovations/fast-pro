@@ -42,6 +42,9 @@ const UPDATE_PROCUREMENT_ID = randomUUID();
 const VIEW_PROCUREMENT_ID = randomUUID();
 const DELETE_PROCUREMENT_ID = randomUUID();
 
+const VIEW_ORDER_ID = randomUUID();
+const UPDATE_ORDER_ID = randomUUID();
+
 const RolesSeed = {
   run: async () => {
     await dbClient
@@ -216,6 +219,16 @@ const RolesSeed = {
           name: 'DELETE_PROCUREMENT',
           description: 'Can delete procurement',
         },
+        {
+          id: UPDATE_ORDER_ID,
+          name: 'UPDATE_ORDER',
+          description: 'Can update order',
+        },
+        {
+          id: VIEW_ORDER_ID,
+          name: 'VIEW_ORDER',
+          description: 'Can view order',
+        },
       ])
       .execute();
 
@@ -311,6 +324,14 @@ const RolesSeed = {
           roleId: ADMIN_ROLE_ID,
           permissionId: DELETE_PROCUREMENT_ID,
         },
+        {
+          roleId: ADMIN_ROLE_ID,
+          permissionId: UPDATE_ORDER_ID,
+        },
+        {
+          roleId: ADMIN_ROLE_ID,
+          permissionId: VIEW_ORDER_ID,
+        },
 
         // requester role
         {
@@ -386,6 +407,15 @@ const RolesSeed = {
         {
           roleId: VENDOR_ROLE_ID,
           permissionId: VIEW_PROPOSAL_REQUEST_PERMISSION_ID,
+        },
+
+        {
+          roleId: VENDOR_ROLE_ID,
+          permissionId: UPDATE_ORDER_ID,
+        },
+        {
+          roleId: VENDOR_ROLE_ID,
+          permissionId: VIEW_ORDER_ID,
         },
       ])
       .execute();

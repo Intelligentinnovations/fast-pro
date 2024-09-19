@@ -49,13 +49,22 @@ export const ProcurementStatus = {
 } as const;
 export type ProcurementStatus =
   (typeof ProcurementStatus)[keyof typeof ProcurementStatus];
-export const ProcurementItemStatus = {
+export const ItemStatus = {
   pending: 'pending',
   accepted: 'accepted',
   rejected: 'rejected',
 } as const;
-export type ProcurementItemStatus =
-  (typeof ProcurementItemStatus)[keyof typeof ProcurementItemStatus];
+export type ItemStatus = (typeof ItemStatus)[keyof typeof ItemStatus];
+export const OrderStatus = {
+  pending: 'pending',
+  confirmed: 'confirmed',
+  processing: 'processing',
+  shipped: 'shipped',
+  cancelled: 'cancelled',
+  rejected: 'rejected',
+  delivered: 'delivered',
+} as const;
+export type OrderStatus = (typeof OrderStatus)[keyof typeof OrderStatus];
 export type CartItem = {
   id: Generated<string>;
   userId: string;
@@ -79,6 +88,35 @@ export type Invite = {
   roleId: string;
   departmentId: string;
   status: Generated<InviteStatus>;
+  created_at: Generated<Timestamp>;
+  updated_at: Timestamp | null;
+};
+export type Order = {
+  id: Generated<string>;
+  procurementId: string;
+  organizationId: string;
+  vendorId: string;
+  organizationName: string;
+  amount: string;
+  itemDetails: string;
+  requestedBy: string;
+  requiredDate: Timestamp;
+  status: Generated<OrderStatus>;
+  created_at: Generated<Timestamp>;
+  updated_at: Timestamp | null;
+};
+export type OrderItem = {
+  id: Generated<string>;
+  orderId: string;
+  productId: string;
+  variantId: string | null;
+  productName: string;
+  vendorName: string;
+  productImage: string;
+  quantity: number;
+  unitPrice: string;
+  totalPrice: string;
+  status: Generated<ItemStatus>;
   created_at: Generated<Timestamp>;
   updated_at: Timestamp | null;
 };
@@ -123,12 +161,15 @@ export type ProcurementItem = {
   id: Generated<string>;
   procurementId: string;
   productId: string;
+  productName: string;
+  vendorName: string;
+  productImage: string;
   comment: string | null;
   variantId: string | null;
   quantity: number;
   unitPrice: string;
   totalPrice: string;
-  status: Generated<ProcurementItemStatus>;
+  status: Generated<ItemStatus>;
   created_at: Generated<Timestamp>;
   updated_at: Timestamp | null;
 };
@@ -275,6 +316,8 @@ export type DB = {
   CartItem: CartItem;
   Department: Department;
   Invite: Invite;
+  Order: Order;
+  OrderItem: OrderItem;
   Organization: Organization;
   Permission: Permission;
   Procurement: Procurement;

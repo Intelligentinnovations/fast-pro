@@ -47,7 +47,7 @@ export class CartRepository {
         'Product.name as productName',
         'Product.basePrice',
         'Product.quantity as baseProductQuantityInStock',
-        'ProductImage.imageUrl',
+        'ProductImage.imageUrl as productImage',
         'Vendor.name as vendorName',
         'ProductVariant.name as variant',
         'ProductVariant.price as variantPrice',
@@ -64,7 +64,7 @@ export class CartRepository {
         variantId,
         quantity,
         productName,
-        imageUrl,
+        productImage,
         vendorName,
         basePrice,
         variant,
@@ -83,7 +83,7 @@ export class CartRepository {
         price: variantId ? Number(variantPrice) : Number(basePrice),
         total:
           quantity * (variantId ? Number(variantPrice) : Number(basePrice)),
-        imageUrl,
+        productImage,
         vendorName,
         ...(variant ? { variant } : {}),
       })

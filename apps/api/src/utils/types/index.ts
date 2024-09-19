@@ -1,4 +1,5 @@
 export * from './database';
+export * from './order';
 export { Permission } from './permission';
 export * from './procurement';
 export * from './product';

@@ -1,4 +1,4 @@
-import { ProcurementItemStatus } from './database';
+import { ItemStatus } from './database';
 
 export interface CartItems {
   id: string;
@@ -6,15 +6,15 @@ export interface CartItems {
   quantity: number;
   variantId: string | null;
   productName: string;
+  productImage: string;
   remainingStock: number | null;
   price: number;
   total: number;
-  imageUrl: string | null;
   vendorName: string;
 }
 
 export interface UpdateProcurementItem {
   id: string;
-  status: ProcurementItemStatus;
+  status: ItemStatus;
   comment?: string;
 }

@@ -1,8 +1,9 @@
-export { CartRepository } from './cart'
+export { CartRepository } from './cart';
 export { InviteRepo } from './invite';
+export { OrderRepository } from './order';
 export { OrganizationRepo } from './organization';
-export { ProcurementRepo } from './procurement'
-export { ProcurementItemRepo } from './procurementItems'
+export { ProcurementRepo } from './procurement';
+export { ProcurementItemRepo } from './procurementItems';
 export { ProductRepo } from './product';
 export { TaskRepo } from './task';
 export { UserRepo } from './user';
