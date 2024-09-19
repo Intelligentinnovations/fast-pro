@@ -1,3 +1,5 @@
+import { OrderStatus } from './database';
+
 interface IOrder {
   productId: string;
   variantId?: string | null;
@@ -19,4 +21,8 @@ export interface CreateOrderPayload {
   requestedBy: string;
   requiredDate: Date;
   orderItems: IOrder[];
+}
+
+export interface UpdateOrderPayload {
+  status: OrderStatus;
 }

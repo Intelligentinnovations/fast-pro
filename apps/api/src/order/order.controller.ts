@@ -18,8 +18,18 @@ import {
 } from '@nestjs/swagger';
 import { FastifyRequest } from 'fastify';
 
-import { AuthGuard, PermissionsGuard } from '../libraries/guards';
-import { OrderFilters, OrderStatus, UserData } from '../utils';
+import {
+  AuthGuard,
+  PermissionsGuard,
+  RequiredPermission,
+} from '../libraries/guards';
+import {
+  OrderFilters,
+  OrderStatus,
+  Permission,
+  UpdateOrderPayload,
+  UserData,
+} from '../utils';
 import { ApproveOrderDto } from './dto/order.dt.';
 import { OrderService } from './order.service';
 
@@ -31,7 +41,7 @@ export class OrderController {
   constructor(private readonly orderService: OrderService) {}
 
   @Get('')
-  // @RequiredPermission(Permission.VIEW_ORDER)
+  @RequiredPermission(Permission.VIEW_ORDER)
   @ApiQuery({
     name: 'page',
     required: false,
@@ -82,7 +92,7 @@ export class OrderController {
   }
 
   @Get(':id')
-  // @RequiredPermission(Permission.VIEW_ORDER)
+  @RequiredPermission(Permission.VIEW_ORDER)
   @ApiOperation({ summary: 'Get order details' })
   @ApiOkResponse({ description: 'Order details fetched successfully' })
   async fetchOrder(@Req() req: FastifyRequest, @Param('id') orderId: string) {
@@ -91,8 +101,26 @@ export class OrderController {
     return convertAndSendResponse(data);
   }
 
+  @Put(':id/status')
+  @RequiredPermission(Permission.UPDATE_ORDER)
+  @ApiOperation({ summary: 'Update order' })
+  @ApiOkResponse({ description: 'Order updated successfully' })
+  async updateOrder(
+    @Req() req: FastifyRequest,
+    @Body() orderStatus: UpdateOrderPayload,
+    @Param('id') orderId: string
+  ) {
+    const user = req.user as UserData;
+    const data = await this.orderService.updateOrder({
+      user,
+      orderId,
+      orderStatus,
+    });
+    return convertAndSendResponse(data);
+  }
+
   @Put(':id/confirm')
-  // @RequiredPermission(Permission.VIEW_ORDER)
+  @RequiredPermission(Permission.UPDATE_ORDER)
   @ApiOperation({ summary: 'Confirm order' })
   @ApiOkResponse({ description: 'Order confirmed successfully' })
   async confirmOrder(

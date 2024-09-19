@@ -2,7 +2,12 @@ import { IServiceHelper } from '@backend-template/types';
 import { Injectable } from '@nestjs/common';
 
 import { OrderRepository } from '../repository';
-import { ItemStatus, OrderFilters, UserData } from '../utils';
+import {
+  ItemStatus,
+  OrderFilters,
+  UpdateOrderPayload,
+  UserData,
+} from '../utils';
 import { ApproveOrderDto } from './dto/order.dt.';
 
 @Injectable()
@@ -54,18 +59,47 @@ export class OrderService {
         message: 'Order has either been approved or declined',
       };
 
-    const data = order.orderItems.map((item) => ({
-      id: item.id as string,
-      status: param.orderItems.items.some(i => i.orderItemId === item.id) ? 'accepted' : 'rejected',
-    })).map(item => ({
-      ...item,
-      status: item.status as ItemStatus,
-    }));
+    const data = order.orderItems
+      .map((item) => ({
+        id: item.id as string,
+        status: param.orderItems.items.some((i) => i.orderItemId === item.id)
+          ? 'accepted'
+          : 'rejected',
+      }))
+      .map((item) => ({
+        ...item,
+        status: item.status as ItemStatus,
+      }));
 
     await this.orderRepo.confirmOrder(param.orderId, data);
     return {
       status: 'successful',
       message: 'Order approved successfully',
+    };
+  }
+
+  async updateOrder(param: {
+    orderId: string;
+    user: UserData;
+    orderStatus: UpdateOrderPayload;
+  }): Promise<IServiceHelper> {
+    const { orderStatus, orderId } = param;
+    if (param.user.organizationId && param.orderStatus.status === 'cancelled') {
+      await this.orderRepo.updateOrder(orderId, orderStatus);
+      //   TODO SEND NOTIFICATION
+    }
+    if (param.user.organizationId && param.orderStatus.status === 'delivered') {
+      await this.orderRepo.updateOrder(orderId, orderStatus);
+      //   TODO SEND NOTIFICATION
+    }
+    if (param.user.vendorId && param.orderStatus.status === 'shipped') {
+      await this.orderRepo.updateOrder(orderId, orderStatus);
+      //   TODO SEND NOTIFICATION
+    }
+
+    return {
+      status: 'successful',
+      message: 'Order updated successfully',
     };
   }
 }
