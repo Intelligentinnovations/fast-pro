@@ -2,7 +2,8 @@ import { IServiceHelper } from '@backend-template/types';
 import { Injectable } from '@nestjs/common';
 
 import { OrderRepository } from '../repository';
-import { OrderFilters, UserData } from '../utils';
+import { ItemStatus, OrderFilters, UserData } from '../utils';
+import { ApproveOrderDto } from './dto/order.dt.';
 
 @Injectable()
 export class OrderService {
@@ -32,6 +33,39 @@ export class OrderService {
       status: 'successful',
       message: 'Order fetched successfully',
       data: order,
+    };
+  }
+
+  async confirmOrder(param: {
+    orderId: string;
+    user: UserData;
+    orderItems: ApproveOrderDto;
+  }): Promise<IServiceHelper> {
+    const order = await this.orderRepo.fetchOrderDetails(param);
+    if (!order)
+      return {
+        status: 'not-found',
+        message: 'No order with the given id was found',
+      };
+
+    if (order.orderStatus !== 'pending')
+      return {
+        status: 'bad-request',
+        message: 'Order has either been approved or declined',
+      };
+
+    const data = order.orderItems.map((item) => ({
+      id: item.id as string,
+      status: param.orderItems.items.some(i => i.orderItemId === item.id) ? 'accepted' : 'rejected',
+    })).map(item => ({
+      ...item,
+      status: item.status as ItemStatus,
+    }));
+
+    await this.orderRepo.confirmOrder(param.orderId, data);
+    return {
+      status: 'successful',
+      message: 'Order approved successfully',
     };
   }
 }

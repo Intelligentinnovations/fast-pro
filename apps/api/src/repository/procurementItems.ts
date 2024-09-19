@@ -24,7 +24,7 @@ export class ProcurementItemRepo {
       .innerJoin('Product', 'ProcurementItem.productId', 'Product.id')
       .innerJoin('Vendor', 'Product.vendorId', 'Vendor.id')
       .innerJoin('User', 'Procurement.userId', 'User.id')
-      .innerJoin('Organization', 'User.organizationId', 'User.id')
+      .innerJoin('Organization', 'User.organizationId', 'Organization.id')
       .select([
         'Procurement.id as procurementId',
         'Procurement.itemDetails',

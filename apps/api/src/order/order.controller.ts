@@ -1,5 +1,14 @@
 import { convertAndSendResponse } from '@backend-template/helpers';
-import { Controller, Get, Param, Query, Req, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Put,
+  Query,
+  Req,
+  UseGuards,
+} from '@nestjs/common';
 import {
   ApiBearerAuth,
   ApiOkResponse,
@@ -11,6 +20,7 @@ import { FastifyRequest } from 'fastify';
 
 import { AuthGuard, PermissionsGuard } from '../libraries/guards';
 import { OrderFilters, OrderStatus, UserData } from '../utils';
+import { ApproveOrderDto } from './dto/order.dt.';
 import { OrderService } from './order.service';
 
 @ApiTags('Order')
@@ -78,6 +88,24 @@ export class OrderController {
   async fetchOrder(@Req() req: FastifyRequest, @Param('id') orderId: string) {
     const user = req.user as UserData;
     const data = await this.orderService.fetchOrder({ user, orderId });
+    return convertAndSendResponse(data);
+  }
+
+  @Put(':id/confirm')
+  // @RequiredPermission(Permission.VIEW_ORDER)
+  @ApiOperation({ summary: 'Confirm order' })
+  @ApiOkResponse({ description: 'Order confirmed successfully' })
+  async confirmOrder(
+    @Req() req: FastifyRequest,
+    @Body() orderItems: ApproveOrderDto,
+    @Param('id') orderId: string
+  ) {
+    const user = req.user as UserData;
+    const data = await this.orderService.confirmOrder({
+      user,
+      orderId,
+      orderItems,
+    });
     return convertAndSendResponse(data);
   }
 }

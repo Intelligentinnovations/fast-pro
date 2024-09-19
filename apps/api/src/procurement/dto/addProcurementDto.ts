@@ -23,7 +23,7 @@ export class ApprovalItem {
   procurementItemId!: string;
 
   @ApiProperty()
-  isApproved!: boolean;
+  isAccepted!: boolean;
 
   @ApiProperty()
   comment!: string;
@@ -34,4 +34,3 @@ export class ApproveProcurementDto {
   @Type(() => ApprovalItem)
   items!: ApprovalItem[];
 }
-

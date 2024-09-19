@@ -36,8 +36,8 @@ export class ProcurementService {
         status: 'not-found',
         message: 'Please add items to cart to continue',
       };
-      
-    const formattedItems = items.map(item => ({
+
+    const formattedItems = items.map((item) => ({
       ...item,
       productImage: item.productImage || '',
     }));
@@ -108,6 +108,7 @@ export class ProcurementService {
       organizationId,
       procurementId: id,
     });
+
     if (!procurement)
       return {
         status: 'not-found',
