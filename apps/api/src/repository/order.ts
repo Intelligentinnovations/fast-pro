@@ -14,7 +14,7 @@ import {
 
 @Injectable()
 export class OrderRepository {
-  constructor(private readonly client: KyselyService<DB>) {}
+  constructor(private readonly client: KyselyService<DB>) { }
 
   async create(orderPayload: CreateOrderPayload): Promise<void> {
     return this.client.transaction().execute(async (transaction) => {
@@ -70,9 +70,9 @@ export class OrderRepository {
 
     query = isVendor
       ? query
-          .innerJoin('Organization', 'Organization.id', 'Order.organizationId')
-          .where('Order.vendorId', '=', user.vendorId ?? '')
-          .select(['Organization.name as organizationName'])
+        .innerJoin('Organization', 'Organization.id', 'Order.organizationId')
+        .where('Order.vendorId', '=', user.vendorId ?? '')
+        .select(['Organization.name as organizationName'])
       : query.where('Order.organizationId', '=', user.organizationId ?? '');
 
     return paginate<Order>({
@@ -145,6 +145,8 @@ export class OrderRepository {
         .where('id', '=', orderId)
         .execute();
     });
+    // Todo -reduce stock quantity
+    // Todo -create invoice for confirmed order
   }
 
   async updateOrder(orderId: string, orderStatus: UpdateOrderPayload) {
