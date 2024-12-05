@@ -91,6 +91,14 @@ export type Invite = {
   created_at: Generated<Timestamp>;
   updated_at: Timestamp | null;
 };
+export type Invoice = {
+  id: Generated<string>;
+  orderId: string;
+  totalAmount: string;
+  status: Generated<ItemStatus>;
+  created_at: Generated<Timestamp>;
+  updated_at: Timestamp | null;
+};
 export type Order = {
   id: Generated<string>;
   procurementId: string;
@@ -316,6 +324,7 @@ export type DB = {
   CartItem: CartItem;
   Department: Department;
   Invite: Invite;
+  Invoice: Invoice;
   Order: Order;
   OrderItem: OrderItem;
   Organization: Organization;
