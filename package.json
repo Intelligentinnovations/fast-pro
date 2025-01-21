@@ -6,7 +6,7 @@
     "generate-app": "bash scripts/new-app.sh",
     "build": "nx run-many --t build",
     "build:dependencies": "bash scripts/create-dependency-output.sh",
-    "deploy": "pnpm run build && cdk deploy api --previous-parameters=false --asset-parallelism --outputs-file ./env.json --require-approval never",
+    "deploy": "npx cdk deploy",
     "deploy:dependencies": "pnpm run build && pnpm run build:dependencies && cdk deploy dependency",
     "api": "nx serve api",
     "api:seed": "nx serve api:seed"
