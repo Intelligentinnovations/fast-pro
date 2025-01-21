@@ -13,7 +13,7 @@ import { AuthModule } from './auth/auth.module';
 const serverSubject = new ReplaySubject<CallbackHandler>();
 httpBootstrap(AuthModule, 'v1').then((transporter) => {
   serverSubject.next(
-    awsLambdaFastify(transporter.getHttpAdapter().getInstance(), {
+    awsLambdaFastify((transporter.getHttpAdapter().getInstance() as unknown) as import('fastify').FastifyInstance, {
       callbackWaitsForEmptyEventLoop: false,
     })
   );

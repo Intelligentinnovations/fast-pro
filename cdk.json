@@ -1,5 +1,5 @@
 {
-  "app": "node dist/apps/infra/main.js",
+  "app": "npx ts-node -P tsconfig.base.json --prefer-ts-exts infra.ts",
   "watch": {
     "include": [
       "dist/apps/**"
