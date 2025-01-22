@@ -1,0 +1,24 @@
+[NX Daemon Server] - 2025-01-21T16:08:19.166Z - Started listening on: /tmp/cf1708b0360558fef8c2/d.sock
+[NX Daemon Server] - 2025-01-21T16:08:19.170Z - [WATCHER]: Subscribed to changes within: /home/abiodun/WebstormProjects/fast-pro (native)
+[NX Daemon Server] - 2025-01-21T16:08:19.175Z - Established a connection. Number of open connections: 1
+[NX Daemon Server] - 2025-01-21T16:08:19.176Z - Established a connection. Number of open connections: 2
+[NX Daemon Server] - 2025-01-21T16:08:19.179Z - Closed a connection. Number of open connections: 1
+[NX Daemon Server] - 2025-01-21T16:08:19.182Z - [REQUEST]: Responding to the client. Shutdown initiated
+[NX Daemon Server] - 2025-01-21T16:08:19.182Z - Done responding to the client Shutdown initiated
+[NX Daemon Server] - 2025-01-21T16:08:19.182Z - Handled FORCE_SHUTDOWN. Handling time: 1. Response time: 0.
+[NX Daemon Server] - 2025-01-21T16:08:19.183Z - Closed a connection. Number of open connections: 0
+[NX Daemon Server] - 2025-01-21T16:08:19.184Z - [WATCHER]: Stopping the watcher for /home/abiodun/WebstormProjects/fast-pro (sources)
+[NX Daemon Server] - 2025-01-21T16:08:19.184Z - [WATCHER]: Stopping the watcher for /home/abiodun/WebstormProjects/fast-pro (outputs)
+[NX Daemon Server] - 2025-01-21T16:08:19.184Z - Server stopped because: "Request to shutdown"
+[NX Daemon Server] - 2025-01-21T16:20:28.168Z - Started listening on: /tmp/cf1708b0360558fef8c2/d.sock
+[NX Daemon Server] - 2025-01-21T16:20:28.172Z - [WATCHER]: Subscribed to changes within: /home/abiodun/WebstormProjects/fast-pro (native)
+[NX Daemon Server] - 2025-01-21T16:20:28.177Z - Established a connection. Number of open connections: 1
+[NX Daemon Server] - 2025-01-21T16:20:28.178Z - Established a connection. Number of open connections: 2
+[NX Daemon Server] - 2025-01-21T16:20:28.181Z - Closed a connection. Number of open connections: 1
+[NX Daemon Server] - 2025-01-21T16:20:28.183Z - [REQUEST]: Responding to the client. Shutdown initiated
+[NX Daemon Server] - 2025-01-21T16:20:28.184Z - Done responding to the client Shutdown initiated
+[NX Daemon Server] - 2025-01-21T16:20:28.184Z - Handled FORCE_SHUTDOWN. Handling time: 0. Response time: 1.
+[NX Daemon Server] - 2025-01-21T16:20:28.185Z - Closed a connection. Number of open connections: 0
+[NX Daemon Server] - 2025-01-21T16:20:28.186Z - [WATCHER]: Stopping the watcher for /home/abiodun/WebstormProjects/fast-pro (sources)
+[NX Daemon Server] - 2025-01-21T16:20:28.186Z - [WATCHER]: Stopping the watcher for /home/abiodun/WebstormProjects/fast-pro (outputs)
+[NX Daemon Server] - 2025-01-21T16:20:28.186Z - Server stopped because: "Request to shutdown"

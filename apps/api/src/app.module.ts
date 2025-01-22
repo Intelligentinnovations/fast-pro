@@ -1,6 +1,6 @@
 import { DefaultInterceptor } from '@backend-template/rest-server';
 import { CacheModule } from '@nestjs/cache-manager';
-import { Module } from '@nestjs/common';
+import { Global, Module } from '@nestjs/common';
 import { APP_INTERCEPTOR } from '@nestjs/core';
 import { redisStore } from 'cache-manager-redis-yet';
 
